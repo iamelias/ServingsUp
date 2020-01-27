@@ -9,23 +9,39 @@
 /* Begin PBXBuildFile section */
 		6433A13823DE7989002A14BF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A13723DE7989002A14BF /* AppDelegate.swift */; };
 		6433A13A23DE7989002A14BF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A13923DE7989002A14BF /* SceneDelegate.swift */; };
-		6433A13C23DE7989002A14BF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A13B23DE7989002A14BF /* ViewController.swift */; };
+		6433A13C23DE7989002A14BF /* DishController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A13B23DE7989002A14BF /* DishController.swift */; };
 		6433A13F23DE7989002A14BF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6433A13D23DE7989002A14BF /* Main.storyboard */; };
 		6433A14223DE7989002A14BF /* ServingsUp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6433A14023DE7989002A14BF /* ServingsUp.xcdatamodeld */; };
 		6433A14423DE798C002A14BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6433A14323DE798C002A14BF /* Assets.xcassets */; };
 		6433A14723DE798C002A14BF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6433A14523DE798C002A14BF /* LaunchScreen.storyboard */; };
+		6433A14F23DE7A58002A14BF /* BookController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A14E23DE7A58002A14BF /* BookController.swift */; };
+		6433A15123DE7A9E002A14BF /* TabShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15023DE7A9E002A14BF /* TabShareController.swift */; };
+		6433A15323DE7ABA002A14BF /* AddIngredientController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15223DE7ABA002A14BF /* AddIngredientController.swift */; };
+		6433A15523DE7AD4002A14BF /* AddDishController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15423DE7AD4002A14BF /* AddDishController.swift */; };
+		6433A15723DE7AED002A14BF /* Dish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15623DE7AED002A14BF /* Dish.swift */; };
+		6433A15923DE7AFC002A14BF /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15823DE7AFC002A14BF /* Book.swift */; };
+		6433A15B23DE7B07002A14BF /* Ingredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15A23DE7B07002A14BF /* Ingredient.swift */; };
+		6433A15E23DE7B22002A14BF /* DatabaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6433A15D23DE7B22002A14BF /* DatabaseController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6433A13423DE7989002A14BF /* ServingsUp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ServingsUp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6433A13723DE7989002A14BF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6433A13923DE7989002A14BF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		6433A13B23DE7989002A14BF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6433A13B23DE7989002A14BF /* DishController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DishController.swift; sourceTree = "<group>"; };
 		6433A13E23DE7989002A14BF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		6433A14123DE7989002A14BF /* ServingsUp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ServingsUp.xcdatamodel; sourceTree = "<group>"; };
 		6433A14323DE798C002A14BF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6433A14623DE798C002A14BF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6433A14823DE798C002A14BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6433A14E23DE7A58002A14BF /* BookController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookController.swift; sourceTree = "<group>"; };
+		6433A15023DE7A9E002A14BF /* TabShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShareController.swift; sourceTree = "<group>"; };
+		6433A15223DE7ABA002A14BF /* AddIngredientController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddIngredientController.swift; sourceTree = "<group>"; };
+		6433A15423DE7AD4002A14BF /* AddDishController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDishController.swift; sourceTree = "<group>"; };
+		6433A15623DE7AED002A14BF /* Dish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dish.swift; sourceTree = "<group>"; };
+		6433A15823DE7AFC002A14BF /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
+		6433A15A23DE7B07002A14BF /* Ingredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredient.swift; sourceTree = "<group>"; };
+		6433A15D23DE7B22002A14BF /* DatabaseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,16 +74,32 @@
 		6433A13623DE7989002A14BF /* ServingsUp */ = {
 			isa = PBXGroup;
 			children = (
+				6433A15C23DE7B0F002A14BF /* New Group */,
 				6433A13723DE7989002A14BF /* AppDelegate.swift */,
 				6433A13923DE7989002A14BF /* SceneDelegate.swift */,
-				6433A13B23DE7989002A14BF /* ViewController.swift */,
+				6433A13B23DE7989002A14BF /* DishController.swift */,
+				6433A14E23DE7A58002A14BF /* BookController.swift */,
 				6433A13D23DE7989002A14BF /* Main.storyboard */,
 				6433A14323DE798C002A14BF /* Assets.xcassets */,
 				6433A14523DE798C002A14BF /* LaunchScreen.storyboard */,
 				6433A14823DE798C002A14BF /* Info.plist */,
 				6433A14023DE7989002A14BF /* ServingsUp.xcdatamodeld */,
+				6433A15023DE7A9E002A14BF /* TabShareController.swift */,
+				6433A15223DE7ABA002A14BF /* AddIngredientController.swift */,
+				6433A15423DE7AD4002A14BF /* AddDishController.swift */,
+				6433A15623DE7AED002A14BF /* Dish.swift */,
+				6433A15823DE7AFC002A14BF /* Book.swift */,
+				6433A15A23DE7B07002A14BF /* Ingredient.swift */,
+				6433A15D23DE7B22002A14BF /* DatabaseController.swift */,
 			);
 			path = ServingsUp;
+			sourceTree = "<group>";
+		};
+		6433A15C23DE7B0F002A14BF /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,10 +173,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6433A13C23DE7989002A14BF /* ViewController.swift in Sources */,
+				6433A15323DE7ABA002A14BF /* AddIngredientController.swift in Sources */,
+				6433A13C23DE7989002A14BF /* DishController.swift in Sources */,
+				6433A15123DE7A9E002A14BF /* TabShareController.swift in Sources */,
+				6433A14F23DE7A58002A14BF /* BookController.swift in Sources */,
 				6433A14223DE7989002A14BF /* ServingsUp.xcdatamodeld in Sources */,
 				6433A13823DE7989002A14BF /* AppDelegate.swift in Sources */,
+				6433A15723DE7AED002A14BF /* Dish.swift in Sources */,
 				6433A13A23DE7989002A14BF /* SceneDelegate.swift in Sources */,
+				6433A15E23DE7B22002A14BF /* DatabaseController.swift in Sources */,
+				6433A15923DE7AFC002A14BF /* Book.swift in Sources */,
+				6433A15523DE7AD4002A14BF /* AddDishController.swift in Sources */,
+				6433A15B23DE7B07002A14BF /* Ingredient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
