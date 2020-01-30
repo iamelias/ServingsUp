@@ -37,22 +37,6 @@ class AddIngredientController: UIViewController {
         selectedUnitArray = weightUnitArray
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        
-    }
-    
     @IBAction func stepperUsed(_ sender: UIStepper) {
         var number = 0
         number = Int(sender.value)

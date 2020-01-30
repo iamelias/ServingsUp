@@ -17,13 +17,18 @@ import Foundation
 import UIKit
 
 class TabShareController: UITabBarController {
-    var ingredArray: [Ingredient] = [] //contains all the ingredients to be displayed in dishController
-    var foodName: String = "Empty" //contains food name that will be title of Dish Controller
-    var servings: String = "" //DishController saved stepper value
-    var saving: Bool = false
-    var returning: Bool = false
+//    var ingredArray: [Ingredient] = [] //contains all the ingredients to be displayed in dishController
+//    var foodName: String = "Empty" //contains food name that will be title of Dish Controller
+//    var servings: String = "" //DishController saved stepper value
+//    var saving: Bool = false
+//    var returning: Bool = false
+//    var allDishes: CoreDish!
     
-    var testBookArray: [Dish] = [] //test transfering data to from DishtoBook controller
-    var stringArray: [String] = [] //Array holding string name of all objects for search
-    var arrayIndex: Int?
+    var allDishes: [CoreDish] = []
+    var selectedDish: CoreDish! //assigned value when user selects cell in BookController, used in rearrange method in DishController
+    var returning = false
+    
+//    var testBookArray: [Dish] = [] //test transfering data to from DishtoBook controller
+//    var stringArray: [String] = [] //Array holding string name of all objects for search
+//    var arrayIndex: Int?
 }

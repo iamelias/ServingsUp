@@ -45,7 +45,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="5qK-7B-3Lp">
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="5qK-7B-3Lp">
                                 <rect key="frame" x="140" y="677" width="94" height="32"/>
                                 <connections>
                                     <action selector="stepperTapped:" destination="BYZ-38-t0r" eventType="valueChanged" id="awY-fR-JKE"/>
@@ -103,7 +103,11 @@
                             </barButtonItem>
                         </leftBarButtonItems>
                         <rightBarButtonItems>
-                            <barButtonItem systemItem="trash" id="cDi-14-wuD"/>
+                            <barButtonItem systemItem="trash" id="cDi-14-wuD">
+                                <connections>
+                                    <action selector="trashButtonTapped:" destination="BYZ-38-t0r" id="kUf-Pf-hcG"/>
+                                </connections>
+                            </barButtonItem>
                             <barButtonItem title="Item" image="info.circle" catalog="system" id="AYd-l0-v7o"/>
                         </rightBarButtonItems>
                     </navigationItem>
@@ -237,7 +241,7 @@
         <!--Add Ingredient Controller-->
         <scene sceneID="aID-o9-9Ra">
             <objects>
-                <viewController id="J18-24-TC2" customClass="AddIngredientController" customModule="ServingsUp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddIngredientController" id="J18-24-TC2" customClass="AddIngredientController" customModule="ServingsUp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ySD-Ae-Ioz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -278,7 +282,7 @@
                             <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf5-Am-mmT">
                                 <rect key="frame" x="0.0" y="399" width="375" height="216"/>
                             </pickerView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txS-oI-9id">
+                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txS-oI-9id">
                                 <rect key="frame" x="308" y="354" width="51" height="30"/>
                                 <state key="normal" title="Volume"/>
                             </button>
@@ -290,7 +294,7 @@
                                     <action selector="dismissButtonTapped:" destination="J18-24-TC2" eventType="touchUpInside" id="f2J-wI-jNW"/>
                                 </connections>
                             </button>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="fNA-eF-6Kg">
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="fNA-eF-6Kg">
                                 <rect key="frame" x="140" y="229" width="94" height="32"/>
                                 <connections>
                                     <action selector="stepperUsed:" destination="J18-24-TC2" eventType="valueChanged" id="u5Z-Vr-PnH"/>
@@ -317,7 +321,7 @@
                                     <action selector="addButtonTapped:" destination="J18-24-TC2" eventType="touchUpInside" id="TgO-Fx-k1d"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cw3-rl-SyX">
+                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cw3-rl-SyX">
                                 <rect key="frame" x="16" y="354" width="49" height="30"/>
                                 <state key="normal" title="Weight"/>
                             </button>

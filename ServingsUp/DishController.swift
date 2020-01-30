@@ -25,24 +25,13 @@ class DishController: UIViewController, UITextFieldDelegate {
     let context = DatabaseController.persistentStoreContainer().viewContext
     var ingredientsArray: [Ingredient] = [] //holds all current dish ingredients
     var dishes: [CoreDish] = [] //stores dishes from core data, stored by creationdate
-    //var selectedDish: CoreDish!
-    var fetchResult: [CoreDish] = [] //retrieved dishes from core data
-    var fetchIngResults: [CoreIngredient] = []
-    var ingredients: [CoreIngredient] = [] //stores ingredients frommm core data
+    var ingredients: [CoreIngredient] = [] //stores ingredients from core data
+   // var ingDish: CoreDish! Last Dish
     var savedDishName: String = "" //dish name
-    var recievedData: UITabBarDelegate!
-    var globalTab: TabShareController {
-        let tab = tabBarController as! TabShareController
-        return tab
+    var tab: TabShareController {
+        return tabBarController as! TabShareController
     }
-    var navigationTitleEmpty: Bool {
-        if savedDishName == "" && navigationItem.title == "" { //if there is not a saved name and default
-            return true
-        }
-        
-        return false
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
@@ -51,94 +40,153 @@ class DishController: UIViewController, UITextFieldDelegate {
         hideView.backgroundColor = .gray //hideview is gray (*view)
         hideView.alpha = 0.5 //hide view is 50% transparent (*view)
         saveButton.isEnabled = false // save button isn't enabled initially. need to add 1 ingredient first
-        //retrieveCoreData() //calling to retrieve all dishes and ingredients from core data. (Move to ViewDidAppear)
-        //fetchDishes() // getting all dishes in core data
-        //fetchIngredients() // getting all ingredients of last created entity
-        //tableView.reloadData()
+        fetchDishes() // getting all dishes in core data
+        fetchIngredients() // getting all ingredients of last created entity
+        tableView.reloadData()
 
         //tabBarController?.selectedIndex = 1 //If wanting to display BookController first //use with core data when determining if there is a saved dish
     }
     
     override func viewDidAppear(_ animated: Bool) {
         
-        let tab = tabBarController as! TabShareController
-
-        if tab.returning == true { //if returning from BookController
-            navigationItem.title = tab.testBookArray[tab.arrayIndex!].dishName //use saved dishTitle
-            ingredientsArray = tab.ingredArray //using saved ingredients array for specific cell
-            tab.returning = false //turning off tab returning
+        if tab.returning == true {
+            rearrangeDishes()
+            tab.returning = false
         }
+    }
+
+    
+    func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
+        
+        let fetchRequest: NSFetchRequest<CoreDish> = CoreDish.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true) //last dish is latest dated dish
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        do {
+            dishes = try context.fetch(fetchRequest) //setting fetched result into array
+        }
+        catch{
+            print("unable to fetch")
+//                        debugprint(error)
+            return
+        }
+    }
+    
+      func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients global array
+        
+        guard dishes.count != 0 else { return}
+          let selectedDish = getCurrentDish() //getting last dish in dishes array/ most recent created dish
+          
+          let fetchRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
+          let predicate = NSPredicate(format: "dish == %@", selectedDish) //%@ will get replaced selected dish at runtime
+          fetchRequest.predicate = predicate //using setup predicate
+          
+          let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true ) //last ingredient is latest dated ingredient
+          fetchRequest.sortDescriptors = [sortDescriptor]
+    
+          do {
+              ingredients = try context.fetch(fetchRequest) //fetched results stored in ingredients
+          }
+          catch{
+              print("unable to fetch")
+              return
+          }
+      }
+    
+    func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
+        print("?????")
+        var coreDish = CoreDish(context: context)
+        coreDish = dish //making passed in object the object that will be saved in core data
+        print("&&&&& made it to saveCoreDish")
+        DatabaseController.saveContext() //saving to core data
+        print("***** made it past saveCoreDish")
+        
+        dishes.append(coreDish) //adding to local dishes array
+    }
+    
+    
+    func saveCoreIng(_ food: Ingredient) -> CoreIngredient { //creates a CoreIngredient
+        let coreIn = CoreIngredient(context: context)
+        coreIn.creationDate = food.creationDate
+        coreIn.name = food.name
+        coreIn.modifiedIngredient = food.modifiedIngredient
+        coreIn.editedServings = "\(food.servings)"
+        //coreIn.lastAccessed = Date()
+        DatabaseController.saveContext() //saving new CoreIngredient into Core Data
+        
+        return coreIn
+        
+    }
+    
+    func addCoreIngredient(_ ingredient: CoreIngredient) { //adding CoreIngredients to "ingredients array)
+        
+        ingredients.append(ingredient)
+    }
+    
+    func getCurrentDish() -> CoreDish { // returns the last created dish in dishes array. Used in fetchIngredients for ingredients call
+        
+        let lastDish = dishes.popLast() //most recently created
+       // ingDish = lastDish // saving a copy to class property
+        return lastDish!
+    }
+
+    func clearCoreIngredients() { //empties core data
+        for i in 0..<ingredients.count { //empties core data
+            context.delete(ingredients[i])
+            DatabaseController.saveContext()
+        }
+    }
+    
+    func deleteDish(selectDish: CoreDish) { //deletes a selected dish from core data
+        context.delete(selectDish)
+        DatabaseController.saveContext()
+    }
+    
+    func deleteIngredient(selectIngredient: CoreIngredient) { //deletes ingredient core data.
+
+        context.delete(selectIngredient)
+        DatabaseController.saveContext()
+    }
+    
+    func defaultView() { //default view if no dish is selected
+        ingredients = []
+        clearCoreIngredients() // removes all ingredients from core data
+        navigationItem.title = "Untitled"
+        quantLabel.text = "1"
+        
         tableView.reloadData()
     }
     
-    
-    func fetchDishes() { //Getting all dishes in creation date order, storing in dishes global array
+    func createDish(_ selectedDish: String) -> CoreDish { //create new dish function
+        print("made it to create dish")
+        let newDish = CoreDish(context: context)
+        print("made it past CoreDish()")
+        newDish.name = selectedDish
+        newDish.editedServings = quantLabel.text
+        newDish.creationDate = Date()
         
-        let fetchRequest: NSFetchRequest<CoreDish> = CoreDish.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-//        let predicate = NSPredicate(format: "lastAccessed == true")
-//        fetchRequest.predicate = predicate
-        
-        do {
-            fetchResult = try context.fetch(fetchRequest) //setting fetched result into array
-            dishes = fetchResult
-        }
-        catch{
-            print("unable to fetch")
-            //            debugprint(error)
-            return
-        }
+        return newDish
     }
     
-    func getCurrentDish() -> CoreDish { // returns the last created dish in dishes array
-        let lastDish = dishes.popLast() //most recently created
-        return lastDish!
-    }
-    
-    func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients global array
-        
-        let selectedDish = getCurrentDish() //getting last dish in dishes array/ most recent created dish
-        
-        let fetchRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
-        let predicate = NSPredicate(format: "dish == %@", selectedDish) //%@ will get replaced by selectedPin at runtime. Purpose is to get photos filtered for selected pin
-        fetchRequest.predicate = predicate //using setup predicate
-        
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false ) //top is newest photos
-        fetchRequest.sortDescriptors = [sortDescriptor]
-  
-        do {
-            fetchIngResults = try context.fetch(fetchRequest) //setting fetched result into array
-            ingredients = fetchIngResults
-        }
-        catch{
-            print("unable to fetch")
-            return
+    func rearrangeDishes() {
+        tab.selectedDish.creationDate = Date() //updating creation date
+        dishes.append(tab.selectedDish) //adding selected dish to end of array
+        for i in 0..<dishes.count - 1 { //Don't include last element in iteration
+            if dishes[i] == tab.selectedDish! { //removing dish from dishes if it matches the selected dish
+            dishes.remove(at: i)
+            
+                print("removed dish and added it to the end")
+            //break
+            }
+            else { print("dish was not removed from dishes in DishController")}
         }
     }
     
-    func retrieveCoreData() { //Getting core data will return dish objects
-        //will retrieve from core data full Book. Will retrieve all the dishes and will make it the initial value of the Book class array
-        
-        let testDishes1 = Dish()
-        testDishes1.dishName = "Meal1"
-        let testDishes2 = Dish()
-        testDishes2.dishName = "Meal2"
-        let testDishes3 = Dish()
-        testDishes3.dishName = "Meal3"
-        let testDishes4 = Dish()
-        testDishes4.dishName = "Meal4"
-        let testDishes5 = Dish()
-        testDishes5.dishName = "Meal5"
-        
-        let testDishArray: [Dish] = [testDishes1,testDishes2,testDishes3,testDishes4,testDishes5]
-        
-        let testBook = testDishArray //testBook will be used in place of coredata to test to rep array of dishes
-        
-        let tab = tabBarController as! TabShareController
-        tab.testBookArray = testBook //setting retrieved book array to tabshare book array
+    @objc func alertBackgroundTapped()
+    {
+        self.dismiss(animated: true, completion: nil) //dismissing alert at background tap
     }
-
+    
+    //MARK: IBACTIONS - START
     @IBAction func stepperTapped(_ sender: UIStepper) { //Stepper changing quantLabel/number of servings
         var number = 1
         number = Int(sender.value)
@@ -158,37 +206,39 @@ class DishController: UIViewController, UITextFieldDelegate {
         
         present(selectedVC, animated: true, completion: nil)
     }
-    @IBAction func test(_ sender: Any) {
-        tableView.reloadData()
-    }
-    
+
     @IBAction func saveButtonTapped(_ sender: Any) {
-        
+        print("connected with saveButtonTapped")
         createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
         defaultView()
     }
-    
+    //MARK: IBACTIONS - END
+}
+  //MARK: ALERT - START
+    extension DishController {
     func createAlert(alertTitle: String, alertMessage: String) {
-        
+        print("Made it into createAlert")
         let alert = UIAlertController(title: alertTitle , message: alertMessage, preferredStyle: .alert)
         alert.addTextField()
         
         let submitAction = UIAlertAction(title: "Save", style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
             self.savedDishName = answer.text ?? "Dish"
-            
+            print("$$$$$$$$$$")
             guard self.savedDishName != "Dish" else {//Dish name is not allowed
                 let passMessage = "Choose a different name"
                 self.navigationItem.title = self.savedDishName
                 self.createAlert(alertTitle: "Invalid", alertMessage: passMessage) //alert to rechoose name
                 return
             }
-            
-            self.navigationItem.title = self.savedDishName
-            let newDish = self.createDishObject()
-            self.addToTabBook(newDish)
+            print("^^^^^^^")
+            self.navigationItem.title = self.savedDishName // nav title updates to saved name
+            let newDish = self.createDish(self.savedDishName)//creating an object that has input text as property
+            print("Made it heeerrreee")
+            self.saveCoreDish(newDish) //sending that object to be saved
+            self.tableView.reloadData()
         }
         
         alert.addAction(submitAction)
@@ -196,47 +246,9 @@ class DishController: UIViewController, UITextFieldDelegate {
             alert.view.superview?.isUserInteractionEnabled = true
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
     }
-    
-    func defaultView() {
-        ingredientsArray = []
-        navigationItem.title = "Untitled"
-        quantLabel.text = "1"
-        
-        tableView.reloadData()
-    }
-    
-    func addToTabBook(_ newDish: Dish) {
-        let tab = tabBarController as! TabShareController
-        tab.testBookArray.append(newDish)
-        
-    }
-    
-    func createDishObject() -> Dish {
-        let dishObject = Dish()
-        dishObject.dishContents = self.ingredientsArray
-        dishObject.editedServings = quantLabel.text ?? "1"
-        dishObject.dishName = savedDishName
-        dishObject.creationDate = Date()
-        
-        return dishObject
-    }
-    
-    func saveCurrentDish() { //presents another alert
-        
-        let tab = self.tabBarController as! TabShareController //saving
-        tab.ingredArray = self.ingredientsArray
-        tab.foodName = self.savedDishName
-        tab.servings = self.quantLabel.text ?? "1" //modified servings
-        tab.saving = true
-        
-    }
-    
-    @objc func alertBackgroundTapped()
-    {
-        self.dismiss(animated: true, completion: nil) //dismissing alert at background tap
-    }
 }
 
+//MARK: ALERT - END
 
 
 
@@ -251,7 +263,7 @@ class DishController: UIViewController, UITextFieldDelegate {
 
 
 
-//MARK: TableViewController
+//MARK: TABLE VIEW - START
 extension DishController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -264,14 +276,14 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         
-        return ingredients.count
+        return ingredients.count // number of cells = number of ingredients
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
         
-        cell?.textLabel!.text = ingredients[indexPath.row].name
-        cell?.detailTextLabel!.text = String(ingredients[indexPath.row].modifiedIngredient!)
+        cell?.textLabel!.text = ingredients[indexPath.row].name //cel text = ingredient name at indexPath
+        cell?.detailTextLabel!.text = String(ingredients[indexPath.row].modifiedIngredient!) //detailText = ingredient amount and unit combined into modifiedIngredient
         
         return cell!
     }
@@ -282,10 +294,13 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         ingredients.remove(at: indexPath.row) //removing from array
+        deleteIngredient(selectIngredient: ingredients[indexPath.row])
         tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
     }
 }
+//MARK: TABLE VIEW - END
 
+//MARK: ADD INGREDIENT DELEGATE - BEGIN
 extension DishController: AddIngredientDelegate {
     
     func getIngredient(food: Ingredient) { //Getting new ingredient to add to dish
@@ -293,9 +308,10 @@ extension DishController: AddIngredientDelegate {
         hideView.isHidden = true
 
         let modifiedFood = modifyServingAmount(food, false) //to change food weight/volume to be for 1 serving
-        ingredientsArray.append(modifiedFood) //adding modified food object to array
+        let coreIng = saveCoreIng(modifiedFood) // creating a CoreIngredient
+        addCoreIngredient(coreIng) //appending a core Ingredient to "ingredients"
         
-        tableView.reloadData() //reloading table to show food object
+        tableView.reloadData() //reloading table to show new CoreIngredient
     }
     
     func modifyServingAmount(_ food: Ingredient, _ selfStepper: Bool) -> Ingredient { //changing weight/volume to match current screens stepper
@@ -312,3 +328,4 @@ extension DishController: AddIngredientDelegate {
     }
 }
 
+//MARK: - ADD INGREDIENT DELEGATE - END
