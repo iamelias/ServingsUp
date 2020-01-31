@@ -48,13 +48,15 @@ class DishController: UIViewController, UITextFieldDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
         if tab.returning == true {
             rearrangeDishes()
             tab.returning = false
         }
-    }
+        print("disches count: \(dishes.count)")
+//        deleteCoreDishes()
+//        print("dishes count: \(dishes.count)")
 
+    }
     
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
         
@@ -63,12 +65,24 @@ class DishController: UIViewController, UITextFieldDelegate {
         fetchRequest.sortDescriptors = [sortDescriptor]
         do {
             dishes = try context.fetch(fetchRequest) //setting fetched result into array
+            guard dishes.count != 0 else {
+                return
+            }
+            let homeDish = getCurrentDish()
+            updateView(homeDish)
         }
         catch{
             print("unable to fetch")
 //                        debugprint(error)
             return
         }
+    }
+    func updateView(_ selectedDish: CoreDish) {
+        hideView.isHidden = true
+        navigationItem.title = selectedDish.name
+        quantLabel.text = selectedDish.editedServings
+    
+        
     }
     
       func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients global array
@@ -93,12 +107,9 @@ class DishController: UIViewController, UITextFieldDelegate {
       }
     
     func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
-        print("?????")
         var coreDish = CoreDish(context: context)
         coreDish = dish //making passed in object the object that will be saved in core data
-        print("&&&&& made it to saveCoreDish")
         DatabaseController.saveContext() //saving to core data
-        print("***** made it past saveCoreDish")
         
         dishes.append(coreDish) //adding to local dishes array
     }
@@ -128,6 +139,13 @@ class DishController: UIViewController, UITextFieldDelegate {
        // ingDish = lastDish // saving a copy to class property
         return lastDish!
     }
+    
+    func deleteCoreDishes() {
+        for i in 0..<dishes.count {
+            context.delete(dishes[i])
+            DatabaseController.saveContext()
+        }
+    }
 
     func clearCoreIngredients() { //empties core data
         for i in 0..<ingredients.count { //empties core data
@@ -146,7 +164,7 @@ class DishController: UIViewController, UITextFieldDelegate {
         context.delete(selectIngredient)
         DatabaseController.saveContext()
     }
-    
+
     func defaultView() { //default view if no dish is selected
         ingredients = []
         clearCoreIngredients() // removes all ingredients from core data
@@ -157,9 +175,7 @@ class DishController: UIViewController, UITextFieldDelegate {
     }
     
     func createDish(_ selectedDish: String) -> CoreDish { //create new dish function
-        print("made it to create dish")
         let newDish = CoreDish(context: context)
-        print("made it past CoreDish()")
         newDish.name = selectedDish
         newDish.editedServings = quantLabel.text
         newDish.creationDate = Date()
@@ -174,7 +190,6 @@ class DishController: UIViewController, UITextFieldDelegate {
             if dishes[i] == tab.selectedDish! { //removing dish from dishes if it matches the selected dish
             dishes.remove(at: i)
             
-                print("removed dish and added it to the end")
             //break
             }
             else { print("dish was not removed from dishes in DishController")}
@@ -208,7 +223,6 @@ class DishController: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func saveButtonTapped(_ sender: Any) {
-        print("connected with saveButtonTapped")
         createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
@@ -219,24 +233,20 @@ class DishController: UIViewController, UITextFieldDelegate {
   //MARK: ALERT - START
     extension DishController {
     func createAlert(alertTitle: String, alertMessage: String) {
-        print("Made it into createAlert")
         let alert = UIAlertController(title: alertTitle , message: alertMessage, preferredStyle: .alert)
         alert.addTextField()
         
         let submitAction = UIAlertAction(title: "Save", style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
             self.savedDishName = answer.text ?? "Dish"
-            print("$$$$$$$$$$")
             guard self.savedDishName != "Dish" else {//Dish name is not allowed
                 let passMessage = "Choose a different name"
                 self.navigationItem.title = self.savedDishName
                 self.createAlert(alertTitle: "Invalid", alertMessage: passMessage) //alert to rechoose name
                 return
             }
-            print("^^^^^^^")
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             let newDish = self.createDish(self.savedDishName)//creating an object that has input text as property
-            print("Made it heeerrreee")
             self.saveCoreDish(newDish) //sending that object to be saved
             self.tableView.reloadData()
         }

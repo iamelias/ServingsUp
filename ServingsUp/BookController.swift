@@ -33,12 +33,13 @@ class BookController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
-        fetchCoreData() //calling core data to populate "dishes"
-        stringNameDishes() //populating "coreDishStrings" as an array of dish names( needed for tableview)
-        tableView.reloadData() //to reload tableview after dishes is populated
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        fetchCoreData() //calling core data to populate "dishes" //will be called everytime opening vc
+        stringNameDishes() //populating "coreDishStrings" as an array of dish names( needed for tableview)
+        tableView.reloadData() //to reload tableview after dishes is populated
+//        deleteCoreDishes()
     }
     
     func fetchCoreData() { //retrieving dishes from core data. sorted by creation date
@@ -48,8 +49,7 @@ class BookController: UIViewController {
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
-            fetchResult = try context.fetch(fetchRequest) //setting fetched result into array
-            dishes = fetchResult
+            dishes = try context.fetch(fetchRequest) //setting fetched result into array
         }
         catch{
             print("unable to fetch dishes in BookController")
@@ -58,7 +58,18 @@ class BookController: UIViewController {
     }
     
     func stringNameDishes() {
-        coreDishStrings = dishes.map{$0.name!} // converts all dishObject names into string elements in new array
+        print(dishes.count)
+        print("&&&&&&&&&")
+        print(dishes)
+        print("&&&&&&&&&")
+        coreDishStrings = dishes.map{$0.name ?? "Empty"} // converts all dishObject names into string elements in new array
+    }
+    
+    func deleteCoreDishes() {
+        for i in 0..<dishes.count {
+            context.delete(dishes[i])
+            DatabaseController.saveContext()
+        }
     }
     
 //    func addCoreData(_ newDish: CoreDish) { //saving dish to core data, this is done after adding a new dish
