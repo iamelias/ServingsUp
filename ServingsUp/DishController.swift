@@ -5,7 +5,7 @@
 //  Created by Elias Hall on 1/26/20.
 //  Copyright © 2020 Elias Hall. All rights reserved.
 //
-
+   //CANT SAVE INGREDIENT UNTIL YOU CREATE THE DISH NAME
 //Recieves Ingredient objects from AddIngredientController. Ingredient Object has a name, serving size, serving amount, and a unit of measurement. Ingredient object is displayed on tableView. Need to edit serving amount to reflect stepper choice in this controller.
 
 import UIKit
@@ -28,6 +28,9 @@ class DishController: UIViewController, UITextFieldDelegate {
     var ingredients: [CoreIngredient] = [] //stores ingredients from core data
    // var ingDish: CoreDish! Last Dish
     var savedDishName: String = "" //dish name
+    var savingDish: CoreDish?
+    var tempDish: CoreDish?
+    var tempIngred: CoreIngredient?
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
@@ -43,6 +46,7 @@ class DishController: UIViewController, UITextFieldDelegate {
         fetchDishes() // getting all dishes in core data
         fetchIngredients() // getting all ingredients of last created entity
         tableView.reloadData()
+//        clearCoreIngredients()
 
         //tabBarController?.selectedIndex = 1 //If wanting to display BookController first //use with core data when determining if there is a saved dish
     }
@@ -53,13 +57,12 @@ class DishController: UIViewController, UITextFieldDelegate {
             tab.returning = false
         }
         print("disches count: \(dishes.count)")
-//        deleteCoreDishes()
+//        deleteCoreDishes() //*****************
 //        print("dishes count: \(dishes.count)")
 
     }
     
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
-        
         let fetchRequest: NSFetchRequest<CoreDish> = CoreDish.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true) //last dish is latest dated dish
         fetchRequest.sortDescriptors = [sortDescriptor]
@@ -69,7 +72,13 @@ class DishController: UIViewController, UITextFieldDelegate {
                 return
             }
             let homeDish = getCurrentDish()
-            updateView(homeDish)
+            print(dishes.count)
+            print(dishes)
+            print("Made it to fetchDishes")
+            if let homeDish1 = homeDish {
+            updateView(homeDish1)
+//            deleteCoreDishes() //****************
+            }
         }
         catch{
             print("unable to fetch")
@@ -78,33 +87,39 @@ class DishController: UIViewController, UITextFieldDelegate {
         }
     }
     func updateView(_ selectedDish: CoreDish) {
+        guard dishes.count != 0 else { return }
         hideView.isHidden = true
         navigationItem.title = selectedDish.name
         quantLabel.text = selectedDish.editedServings
-    
-        
+
     }
     
       func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients global array
-        
         guard dishes.count != 0 else { return}
           let selectedDish = getCurrentDish() //getting last dish in dishes array/ most recent created dish
-          
-          let fetchRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
-          let predicate = NSPredicate(format: "dish == %@", selectedDish) //%@ will get replaced selected dish at runtime
-          fetchRequest.predicate = predicate //using setup predicate
+
+          let ingredRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
+          let predicate = NSPredicate(format: "dish == %@", selectedDish!) //%@ will get replaced selected dish at runtime
+          ingredRequest.predicate = predicate //using setup predicate
           
           let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true ) //last ingredient is latest dated ingredient
-          fetchRequest.sortDescriptors = [sortDescriptor]
+          ingredRequest.sortDescriptors = [sortDescriptor]
     
           do {
-              ingredients = try context.fetch(fetchRequest) //fetched results stored in ingredients
+              ingredients = try context.fetch(ingredRequest) //fetched results stored in ingredients
+            tableView.reloadData()
+
+
           }
           catch{
               print("unable to fetch")
               return
           }
       }
+    
+    func putInTab() {
+        tab.allDishes = dishes
+    }
     
     func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
         var coreDish = CoreDish(context: context)
@@ -114,35 +129,46 @@ class DishController: UIViewController, UITextFieldDelegate {
         dishes.append(coreDish) //adding to local dishes array
     }
     
-    
     func saveCoreIng(_ food: Ingredient) -> CoreIngredient { //creates a CoreIngredient
         let coreIn = CoreIngredient(context: context)
         coreIn.creationDate = food.creationDate
         coreIn.name = food.name
         coreIn.modifiedIngredient = food.modifiedIngredient
         coreIn.editedServings = "\(food.servings)"
-        //coreIn.lastAccessed = Date()
-        DatabaseController.saveContext() //saving new CoreIngredient into Core Data
         
+        coreIn.dish = tempDish //coreIn.dish is the dish associated with this ingredient needed for fetch
+        //tempDish = coreIn.dish
+
+        DatabaseController.saveContext()//saving new CoreIngredient into Core Data
+        tempIngred = coreIn
         return coreIn
-        
     }
+    
+    func updateIngredients(_ selectedDish: CoreDish) {
+        for i in 0..<ingredients.count {
+            ingredients[i].dish = selectedDish
+            DatabaseController.saveContext()
+        }
+    }
+    
+
     
     func addCoreIngredient(_ ingredient: CoreIngredient) { //adding CoreIngredients to "ingredients array)
         
         ingredients.append(ingredient)
     }
     
-    func getCurrentDish() -> CoreDish { // returns the last created dish in dishes array. Used in fetchIngredients for ingredients call
+    func getCurrentDish() -> CoreDish? { // returns the last created dish in dishes array. Used in fetchIngredients for ingredients call
         
         let lastDish = dishes.popLast() //most recently created
        // ingDish = lastDish // saving a copy to class property
-        return lastDish!
+        return lastDish
     }
     
     func deleteCoreDishes() {
         for i in 0..<dishes.count {
             context.delete(dishes[i])
+            context.delete(tempDish!)
             DatabaseController.saveContext()
         }
     }
@@ -167,7 +193,7 @@ class DishController: UIViewController, UITextFieldDelegate {
 
     func defaultView() { //default view if no dish is selected
         ingredients = []
-        clearCoreIngredients() // removes all ingredients from core data
+//        clearCoreIngredients() // removes all ingredients from core data
         navigationItem.title = "Untitled"
         quantLabel.text = "1"
         
@@ -246,8 +272,21 @@ class DishController: UIViewController, UITextFieldDelegate {
                 return
             }
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
-            let newDish = self.createDish(self.savedDishName)//creating an object that has input text as property
-            self.saveCoreDish(newDish) //sending that object to be saved
+            
+//                let newDish = self.createDish(self.savedDishName)//creating an object that has input text as property
+            
+            var createdDish = self.createDish(answer.text!)
+            self.updateIngredients(createdDish)
+//            createdDish = self.tempDish!
+//                createdDish.name = answer.text!
+            
+            
+            
+            
+            
+            self.saveCoreDish(createdDish) //sending that object to be saved
+            self.dishes.append(createdDish)
+            self.tab.allDishes = self.dishes
             self.tableView.reloadData()
         }
         
@@ -259,12 +298,6 @@ class DishController: UIViewController, UITextFieldDelegate {
 }
 
 //MARK: ALERT - END
-
-
-
-
-
-
 
 
 
