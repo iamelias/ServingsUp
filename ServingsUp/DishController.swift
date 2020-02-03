@@ -30,6 +30,7 @@ class DishController: UIViewController, UITextFieldDelegate {
     var savedDishName: String = "" //dish name
     var savingDish: CoreDish?
     var tempDish: CoreDish?
+    var secondDishes: [CoreDish] = []
     var tempIngred: CoreIngredient?
     var tab: TabShareController {
         return tabBarController as! TabShareController
@@ -56,7 +57,7 @@ class DishController: UIViewController, UITextFieldDelegate {
             rearrangeDishes()
             tab.returning = false
         }
-        print("disches count: \(dishes.count)")
+        print("dishes count: \(dishes.count)")
 //        deleteCoreDishes() //*****************
 //        print("dishes count: \(dishes.count)")
 
@@ -71,14 +72,12 @@ class DishController: UIViewController, UITextFieldDelegate {
             guard dishes.count != 0 else {
                 return
             }
-            let homeDish = getCurrentDish()
-            print(dishes.count)
-            print(dishes)
-            print("Made it to fetchDishes")
-            if let homeDish1 = homeDish {
-            updateView(homeDish1)
+
+            dishes.removeFirst()
+            print("newcount: \(dishes.count)")
+            updateView(dishes.last!)
 //            deleteCoreDishes() //****************
-            }
+            tableView.reloadData()
         }
         catch{
             print("unable to fetch")
@@ -89,17 +88,18 @@ class DishController: UIViewController, UITextFieldDelegate {
     func updateView(_ selectedDish: CoreDish) {
         guard dishes.count != 0 else { return }
         hideView.isHidden = true
-        navigationItem.title = selectedDish.name
+        navigationItem.title = dishes.last!.name
         quantLabel.text = selectedDish.editedServings
+        
 
     }
     
       func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients global array
         guard dishes.count != 0 else { return}
-          let selectedDish = getCurrentDish() //getting last dish in dishes array/ most recent created dish
+         // let selectedDish = getCurrentDish() //getting last dish in dishes array/ most recent created dish
 
           let ingredRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
-          let predicate = NSPredicate(format: "dish == %@", selectedDish!) //%@ will get replaced selected dish at runtime
+        let predicate = NSPredicate(format: "dish == %@", dishes.last!) //%@ will get replaced selected dish at runtime
           ingredRequest.predicate = predicate //using setup predicate
           
           let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true ) //last ingredient is latest dated ingredient
@@ -107,6 +107,8 @@ class DishController: UIViewController, UITextFieldDelegate {
     
           do {
               ingredients = try context.fetch(ingredRequest) //fetched results stored in ingredients
+            print("fetched ingredients count: \(ingredients.count)")
+            print("fetched ingredients: \(ingredients)")
             tableView.reloadData()
 
 
@@ -124,6 +126,8 @@ class DishController: UIViewController, UITextFieldDelegate {
     func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
         var coreDish = CoreDish(context: context)
         coreDish = dish //making passed in object the object that will be saved in core data
+        print("dish name: \(dish.name!)")
+        coreDish.name = dish.name
         DatabaseController.saveContext() //saving to core data
         
         dishes.append(coreDish) //adding to local dishes array
@@ -135,6 +139,8 @@ class DishController: UIViewController, UITextFieldDelegate {
         coreIn.name = food.name
         coreIn.modifiedIngredient = food.modifiedIngredient
         coreIn.editedServings = "\(food.servings)"
+        coreIn.amount = food.editedAmount //amount of food per 1 serving
+        coreIn.unit = food.unit
         
         coreIn.dish = tempDish //coreIn.dish is the dish associated with this ingredient needed for fetch
         //tempDish = coreIn.dish
@@ -159,7 +165,7 @@ class DishController: UIViewController, UITextFieldDelegate {
     }
     
     func getCurrentDish() -> CoreDish? { // returns the last created dish in dishes array. Used in fetchIngredients for ingredients call
-        
+//
         let lastDish = dishes.popLast() //most recently created
        // ingDish = lastDish // saving a copy to class property
         return lastDish
@@ -202,9 +208,11 @@ class DishController: UIViewController, UITextFieldDelegate {
     
     func createDish(_ selectedDish: String) -> CoreDish { //create new dish function
         let newDish = CoreDish(context: context)
+//        let newDish = CoreDish()
         newDish.name = selectedDish
         newDish.editedServings = quantLabel.text
         newDish.creationDate = Date()
+        DatabaseController.saveContext()
         
         return newDish
     }
@@ -234,7 +242,7 @@ class DishController: UIViewController, UITextFieldDelegate {
         quantLabel.text = String(number)
         
         for i in 0..<ingredientsArray.count {
-            ingredientsArray[i] = modifyServingAmount(ingredientsArray[i], true)
+            ingredientsArray[i] = modifyServingAmount(ingredientsArray[i], nil, true)
         }
         tableView.reloadData()
     }
@@ -275,17 +283,17 @@ class DishController: UIViewController, UITextFieldDelegate {
             
 //                let newDish = self.createDish(self.savedDishName)//creating an object that has input text as property
             
-            var createdDish = self.createDish(answer.text!)
-            self.updateIngredients(createdDish)
+            print("answer text: \(answer.text!)")
+            let createdDish = self.createDish(answer.text!)
+            print(createdDish.name!)
+            
+            self.updateIngredients(createdDish) //changing the ingredients associated dish
 //            createdDish = self.tempDish!
 //                createdDish.name = answer.text!
             
-            
-            
-            
-            
+
             self.saveCoreDish(createdDish) //sending that object to be saved
-            self.dishes.append(createdDish)
+            //self.dishes.append(createdDish)
             self.tab.allDishes = self.dishes
             self.tableView.reloadData()
         }
@@ -350,24 +358,25 @@ extension DishController: AddIngredientDelegate {
         saveButton.isEnabled = true //hideview disappears and save button is enabled when getting new ingredient
         hideView.isHidden = true
 
-        let modifiedFood = modifyServingAmount(food, false) //to change food weight/volume to be for 1 serving
+        let modifiedFood = modifyServingAmount(food, nil, false) //to change food weight/volume to be for 1 serving
         let coreIng = saveCoreIng(modifiedFood) // creating a CoreIngredient
         addCoreIngredient(coreIng) //appending a core Ingredient to "ingredients"
         
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
     
-    func modifyServingAmount(_ food: Ingredient, _ selfStepper: Bool) -> Ingredient { //changing weight/volume to match current screens stepper
+    func modifyServingAmount(_ food: Ingredient? = nil, _ core: CoreIngredient? = nil, _ selfStepper: Bool) -> Ingredient { //changing weight/volume to match current screens stepper
         
-        food.editedAmount = food.amount/Double(food.servings) //getting weight/volume for 1 serving
+        print(food!.name)
+        food!.editedAmount = food!.amount/Double(food!.servings) //getting weight/volume for 1 serving
         
         let changedQuantLabel = Double(quantLabel!.text!) //converting self stepper to Double for calc
         
-        food.editedAmount = food.editedAmount * Double(changedQuantLabel ?? 1.0) //changing
+        food!.editedAmount = food!.editedAmount * Double(changedQuantLabel ?? 1.0) //changing
         
-        food.modifiedIngredient = "\(food.editedAmount)" + " \(food.unit)"
-        
-        return food
+        food!.modifiedIngredient = "\(food!.editedAmount)" + " \(food!.unit)"
+    
+        return food!
     }
 }
 
