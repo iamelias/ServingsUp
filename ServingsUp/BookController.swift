@@ -212,11 +212,27 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
 //        let dishHolder = dishes
 //        tab.allDishes = dishHolder
         //print("*****\(dishes[indexPath.row])")
-        for i in 0..<dishes.count {
-            print(dishes[i].name ?? "nil")
+        
+        //tableView.reloadData()
+        
+        if searching {
+            print("searchingTabSelect: \(searchDishes[indexPath.row])")
+            
+            for i in 0..<dishes.count {
+                if searchDishes[indexPath.row] == dishes[i].name {
+                    tab.selectedDish = dishes[i]
+                }
+                
+            }
         }
+        
+//        for i in 0..<dishes.count {
+//            print(dishes[i].name ?? "nil")
+//        }
+        if !searching {
         tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
         print("&&&&&& \(tab.selectedDish.name!)")
+        }
         tab.returning = true
         tabBarController?.selectedIndex = 0
     }
