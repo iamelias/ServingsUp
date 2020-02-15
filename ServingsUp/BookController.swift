@@ -1,11 +1,3 @@
-//
-//  BookController.swift
-//  ServingsUp
-//
-//  Created by Elias Hall on 1/26/20.
-//  Copyright © 2020 Elias Hall. All rights reserved.
-//
-
 import Foundation
 import UIKit
 import CoreData
@@ -36,27 +28,28 @@ class BookController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-//        deleteCoreDishes() //emptying before any call
-        //fetchCoreData() //calling core data to populate "dishes" //will be called everytime opening vc
-       // stringNameDishes() //populating "coreDishStrings" as an array of dish names( needed for tableview)
+        dishes = []
+        coreDishStrings = []
+
         dishes = tab.allDishes
-        print("allDishes: \(tab.allDishes)")
-        for i in 0..<tab.allDishes.count {
-            if tab.allDishes[i].name != nil && tab.allDishes[i].name != "" {
-                print("coreDishString: \(coreDishStrings.count)")
-                print("allDishes: \(tab.allDishes.count)")
-                //print(coreDishStrings[i])
-                print(tab.allDishes[i])
-            coreDishStrings[i] = tab.allDishes[i].name ?? "Empty"
-            }
-            
-            tableView.reloadData()
-            
+
+        let dishHolder1 = dishes
+        tab.allDishes = dishHolder1
+        
+        let newdishes = dishes.filter{$0.name != nil}
+
+        for i in 0..<newdishes.count {
+            //dishes.append(newdishes[i])
+            coreDishStrings.append(newdishes[i].name ?? "Nil")
         }
         
-        
         tableView.reloadData() //to reload tableview after dishes is populated
-//        deleteCoreDishes()
+
+        let dishHolder = dishes
+        tab.allDishes = dishHolder
+    }
+    
+    func deleteBlank() {
     }
     
     func fetchCoreData() { //retrieving dishes from core data. sorted by creation date
@@ -72,13 +65,31 @@ class BookController: UIViewController {
             print("unable to fetch dishes in BookController")
             return
         }
+        checkNilDish()
+        //checkCore()
+    }
+    
+    func checkCore() {
+        if coreDishStrings[0] == "Untitled" {
+            coreDishStrings.remove(at: 0)
+            dishes.remove(at: 0)
+            let dishHolder = dishes
+            tab.allDishes = dishHolder
+            tableView.reloadData()
+        }
+        
+    }
+    
+    func checkNilDish() { // will remove all nils in dishes after fetch if any
+        for i in 0..<dishes.count {
+            if dishes[i].name == nil || dishes[i].name == "Untitled" {
+                //print("CheckNil is true")
+                //dishes.remove(at: i)
+            }
+        }
     }
     
     func stringNameDishes() {
-        print(dishes.count)
-        print("&&&&&&&&&")
-        print(dishes)
-        print("&&&&&&&&&")
 
 //        coreDishStrings = dishes.map{$0.name ?? "Empty"} // converts all dishObject names into string elements in new array
         
@@ -88,15 +99,7 @@ class BookController: UIViewController {
             dishStrings[i].append(dishes[i].name!) //append dish string name to dishStrings array
         }
         
-//        guard coreDishStrings.count != 0 else { return }
-//        for i in 0..<coreDishStrings.count { //removing all empty strings and all nils
-//            if coreDishStrings[i] == "Empty" {
-//                coreDishStrings.remove(at: i)
-//                dishes.remove(at: i)
-//            }
-//        }
-
-        print(coreDishStrings)
+       // print(coreDishStrings)
     }
     
     func deleteCoreDishes() {
@@ -106,12 +109,6 @@ class BookController: UIViewController {
         }
     }
     
-//    func addCoreData(_ newDish: CoreDish) { //saving dish to core data, this is done after adding a new dish
-//        let dish = CoreDish()
-//        dish.name = newDish.name
-//        dish.editedServings = newDish.editedServings
-//
-//    }
     
     func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
         var coreDish = CoreDish(context: context)
@@ -132,6 +129,8 @@ class BookController: UIViewController {
         DatabaseController.saveContext()
     }
 
+    
+    //MARK: save/submit code
     func createAlert(_ title: String, _ message: String, _ usesTextField: Bool) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         if usesTextField == true {
@@ -186,6 +185,10 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             return searchDishes.count
         }
         else {
+//            if coreDishStrings.last == "Untitled" {
+//                dishes = []
+//                return 0
+//            }
             return coreDishStrings.count //number of dish objects from core data
         }
     }
@@ -206,8 +209,14 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //save selected dish index path to acess in dish view controller
-        
+//        let dishHolder = dishes
+//        tab.allDishes = dishHolder
+        //print("*****\(dishes[indexPath.row])")
+        for i in 0..<dishes.count {
+            print(dishes[i].name ?? "nil")
+        }
         tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
+        print("&&&&&& \(tab.selectedDish.name!)")
         tab.returning = true
         tabBarController?.selectedIndex = 0
     }
@@ -217,10 +226,18 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         if searching {
         searchDishes.remove(at: indexPath.row)
         }
+
         coreDishStrings.remove(at: indexPath.row) //removing from tableview array
-        dishes.remove(at: indexPath.row) //removing from array of dishes
         deleteCoreData(dishes[indexPath.row]) //deleting from core data
+        dishes.remove(at: indexPath.row) //removing from array of dishes
         tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
+        tableView.reloadData()
+        let dishHolder = dishes
+        tab.deleting = true
+        tab.allDishes = dishHolder
+        //deleteBlank()
+
+        tableView.reloadData()
     }
 }
 
@@ -250,4 +267,3 @@ extension BookController: UISearchBarDelegate {
         tableView.reloadData() //so table changes with cancel
     }
 }
-

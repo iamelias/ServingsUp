@@ -48,7 +48,7 @@
                             <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="5qK-7B-3Lp">
                                 <rect key="frame" x="140" y="677" width="94" height="32"/>
                                 <connections>
-                                    <action selector="stepperTapped:" destination="BYZ-38-t0r" eventType="valueChanged" id="awY-fR-JKE"/>
+                                    <action selector="stepperTapped:" destination="BYZ-38-t0r" eventType="valueChanged" id="D2H-JN-mzz"/>
                                 </connections>
                             </stepper>
                             <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NB4-wN-ZbH">
@@ -117,6 +117,7 @@
                         <outlet property="infoButton" destination="AYd-l0-v7o" id="qyx-u9-9Dk"/>
                         <outlet property="quantLabel" destination="UIJ-3M-FRU" id="VPC-zk-ugg"/>
                         <outlet property="saveButton" destination="XiU-xc-J4D" id="p7L-hU-kxH"/>
+                        <outlet property="stepper" destination="5qK-7B-3Lp" id="GSo-9E-xan"/>
                         <outlet property="tableView" destination="Tux-3V-AiP" id="CUi-LI-ZgP"/>
                     </connections>
                 </viewController>

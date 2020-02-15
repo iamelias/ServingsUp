@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19D76" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CoreDish" representedClassName="CoreDish" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="editedServings" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="stepperValue" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="ingredient" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CoreIngredient" inverseName="dish" inverseEntity="CoreIngredient"/>
     </entity>
     <entity name="CoreIngredient" representedClassName="CoreIngredient" syncable="YES" codeGenerationType="class">
         <attribute name="amount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="checkName" optional="YES" attributeType="String"/>
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="editedAmount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="editedServings" optional="YES" attributeType="String"/>
         <attribute name="modifiedIngredient" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="servings" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="singleAmount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="unit" optional="YES" attributeType="String"/>
         <relationship name="dish" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreDish" inverseName="ingredient" inverseEntity="CoreDish"/>
     </entity>
     <elements>
-        <element name="CoreDish" positionX="-63" positionY="-18" width="128" height="103"/>
-        <element name="CoreIngredient" positionX="-54" positionY="-9" width="128" height="163"/>
+        <element name="CoreDish" positionX="-63" positionY="-18" width="128" height="118"/>
+        <element name="CoreIngredient" positionX="-54" positionY="-9" width="128" height="208"/>
     </elements>
 </model>
