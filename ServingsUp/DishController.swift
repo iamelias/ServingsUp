@@ -60,7 +60,6 @@ class DishController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         
         if dishes.last?.name != navigationItem.title {
-            print("%%%%%%% made it in viewDidAppear")
 //            let newDish = CoreDish()
 //            dishes.append(newDish)
             defaultView()
@@ -194,9 +193,7 @@ class DishController: UIViewController, UITextFieldDelegate {
             dishes.remove(at: 0)
         }
         DatabaseController.saveContext() //saving to core data
-        
-        print("************************** \(dishes.count)")
-        
+                
     }
     
     func saveCoreIng(_ food: CoreIngredient) -> CoreIngredient { //creates a CoreIngredient
@@ -242,10 +239,7 @@ class DishController: UIViewController, UITextFieldDelegate {
         tab.allDishes.removeLast()
         context.delete(selectDish)
         DatabaseController.saveContext()
-        for i in 0..<dishes.count {
-            print("%%%%%%%%%%%%%%%%%% dishes: \(dishes[i].name ?? "nil")")
-        }
-        print("after deleteDish ingredients count: \(ingredients.count)")
+
     }
     
     func deleteIngredient(selectIngredient: CoreIngredient) { //deletes ingredient core data.
@@ -306,10 +300,9 @@ class DishController: UIViewController, UITextFieldDelegate {
        // print("RRRRRRR rearranged called")
         dishes = tab.allDishes
         tab.selectedDish.creationDate = Date() //updating creation date
-        print("^^^^^\(tab.selectedDish.name!)")
+        //print("^^^^^\(tab.selectedDish.name!)")
         
         for i in 0..<dishes.count{ //Don't include last element in iteration
-            print("***** \(dishes[i].name ?? "Nil")")
             if dishes[i].name == tab.selectedDish.name ?? "nil" { //removing dish from dishes if it matches the selected dish
             dishes.remove(at: i)
             break
@@ -325,7 +318,6 @@ class DishController: UIViewController, UITextFieldDelegate {
         dishes = dishes.compactMap{$0}
         for i in 0..<dishes.count {
             if let checkDish = dishes[i].name {
-            print(checkDish)
             }
         }
         tab.allDishes = dishes

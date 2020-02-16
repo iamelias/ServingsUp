@@ -69,6 +69,14 @@ class BookController: UIViewController {
         //checkCore()
     }
     
+    func setUpCoreString() {
+        coreDishStrings = []
+        for i in 0..<dishes.count {
+            //dishes.append(newdishes[i])
+            coreDishStrings.append(dishes[i].name ?? "Nil")
+        }
+    }
+    
     func checkCore() {
         if coreDishStrings[0] == "Untitled" {
             coreDishStrings.remove(at: 0)
@@ -198,6 +206,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         
         if searching {
         cell?.textLabel?.text = searchDishes[indexPath.row]
+           // cell?.isEditing = false
            // searching = false
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
@@ -213,10 +222,9 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
 //        tab.allDishes = dishHolder
         //print("*****\(dishes[indexPath.row])")
         
-        //tableView.reloadData()
+        tableView.reloadData()
         
         if searching {
-            print("searchingTabSelect: \(searchDishes[indexPath.row])")
             
             for i in 0..<dishes.count {
                 if searchDishes[indexPath.row] == dishes[i].name {
@@ -226,33 +234,74 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             }
         }
         
-//        for i in 0..<dishes.count {
-//            print(dishes[i].name ?? "nil")
-//        }
+        for i in 0..<dishes.count {
+            print("&&&&&&& \(dishes[i].name ?? "nil")")
+        }
         if !searching {
         tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
-        print("&&&&&& \(tab.selectedDish.name!)")
         }
         tab.returning = true
         tabBarController?.selectedIndex = 0
     }
     
+    
+//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        if searching {
+//            return UITableViewCell.EditingStyle.none
+//        }
+//
+//        return UITableViewCell.EditingStyle.delete
+//    }
+    
     func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if searching {
-        searchDishes.remove(at: indexPath.row)
+            for i in 0..<dishes.count {
+                print(indexPath.row)
+                print(searchDishes[indexPath.row])
+                if dishes[i].name == searchDishes[indexPath.row] {
+                    print("##### \(dishes[i].name)")
+                    deleteCoreData(dishes[i])
+                    dishes.remove(at: i)
+                    break
+                }
+            }
+            searchDishes.remove(at: indexPath.row)
+            
+            tableView.reloadData()
+            
+            searching = false
+            searchBar.text = ""
+//            tab.allDishes = dishes
+//            tab.selectedDish = dishes[dishes.count-1]
+            tableView.reloadData()
+            for i in 0..<dishes.count {
+                print("****** \(dishes[i].name ?? "Nil")")
+            }
+            coreDishStrings = coreDishStrings.filter{$0 != "nil"}
+                let newDish = dishes
+               dishes = newDish.filter{$0.name != nil}
+            tab.allDishes = dishes
+            setUpCoreString()
+            
+            tableView.reloadData()
+            return
         }
+        
 
+        if !searching {
         coreDishStrings.remove(at: indexPath.row) //removing from tableview array
         deleteCoreData(dishes[indexPath.row]) //deleting from core data
         dishes.remove(at: indexPath.row) //removing from array of dishes
+        }
         tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
         tableView.reloadData()
         let dishHolder = dishes
         tab.deleting = true
         tab.allDishes = dishHolder
         //deleteBlank()
-
+//***********
+      //   dishes = dishes.filter{$0.name != nil}
         tableView.reloadData()
     }
 }
