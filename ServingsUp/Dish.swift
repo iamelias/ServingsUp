@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 import UIKit
 
 class Dish {
@@ -16,3 +17,5 @@ class Dish {
     var creationDate = Date()
     var lastAccessed: Bool = false
 }
+
+var StringDictionary: [String:CoreDish] = [:]

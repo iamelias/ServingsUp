@@ -41,7 +41,10 @@ class BookController: UIViewController {
         for i in 0..<newdishes.count {
             //dishes.append(newdishes[i])
             coreDishStrings.append(newdishes[i].name ?? "Nil")
+            StringDictionary[coreDishStrings[i]] = newdishes[i]
         }
+        
+        coreDishStrings.sort()//sorting view in alphabetic order
         
         tableView.reloadData() //to reload tableview after dishes is populated
 
@@ -74,6 +77,7 @@ class BookController: UIViewController {
         for i in 0..<dishes.count {
             //dishes.append(newdishes[i])
             coreDishStrings.append(dishes[i].name ?? "Nil")
+            coreDishStrings.sort() //sorting in alphabetic order
         }
     }
     
@@ -228,17 +232,21 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             
             for i in 0..<dishes.count {
                 if searchDishes[indexPath.row] == dishes[i].name {
-                    tab.selectedDish = dishes[i]
+                    tab.selectedDish = StringDictionary[searchDishes[indexPath.row]]
+                   //tab.selectedDish = dishes[i]
+                    print(tab.selectedDish.name ?? "nil")
                 }
                 
             }
         }
         
         for i in 0..<dishes.count {
-            print("&&&&&&& \(dishes[i].name ?? "nil")")
+          //  print("&&&&&&& \(dishes[i].name ?? "nil")")
         }
         if !searching {
-        tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
+            tab.selectedDish = StringDictionary[coreDishStrings[indexPath.row]]
+       // tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
+            print(StringDictionary)
         }
         tab.returning = true
         tabBarController?.selectedIndex = 0
@@ -257,10 +265,10 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         
         if searching {
             for i in 0..<dishes.count {
-                print(indexPath.row)
-                print(searchDishes[indexPath.row])
+                //print(indexPath.row)
+               // print(searchDishes[indexPath.row])
                 if dishes[i].name == searchDishes[indexPath.row] {
-                    print("##### \(dishes[i].name)")
+                   // print("##### \(dishes[i].name)")
                     deleteCoreData(dishes[i])
                     dishes.remove(at: i)
                     break
@@ -276,7 +284,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
 //            tab.selectedDish = dishes[dishes.count-1]
             tableView.reloadData()
             for i in 0..<dishes.count {
-                print("****** \(dishes[i].name ?? "Nil")")
+             //   print("****** \(dishes[i].name ?? "Nil")")
             }
             coreDishStrings = coreDishStrings.filter{$0 != "nil"}
                 let newDish = dishes

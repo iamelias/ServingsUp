@@ -5,8 +5,7 @@
 //  Created by Elias Hall on 1/26/20.
 //  Copyright © 2020 Elias Hall. All rights reserved.
 //
-   //CANT SAVE INGREDIENT UNTIL YOU CREATE THE DISH NAME
-//Recieves Ingredient objects from AddIngredientController. Ingredient Object has a name, serving size, serving amount, and a unit of measurement. Ingredient object is displayed on tableView. Need to edit serving amount to reflect stepper choice in this controller.
+
 
 import UIKit
 import Foundation
@@ -459,8 +458,8 @@ extension DishController: AddIngredientDelegate {
         saveButton.isEnabled = true //hideview disappears and save button is enabled when getting new ingredient
         hideView.isHidden = true
 
-        print("food amount: \(food.amount)")
-        print("food servings: \(food.servings)")
+       // print("food amount: \(food.amount)")
+       // print("food servings: \(food.servings)")
         if dishes.last?.name == nil {
             let newDish = CoreDish(context: context)
             newDish.name = "Untitled"
