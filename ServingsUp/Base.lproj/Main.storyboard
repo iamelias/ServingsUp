@@ -108,13 +108,17 @@
                                     <action selector="trashButtonTapped:" destination="BYZ-38-t0r" id="kUf-Pf-hcG"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Item" image="info.circle" catalog="system" id="AYd-l0-v7o"/>
+                            <barButtonItem title="Item" image="camera" catalog="system" id="AYd-l0-v7o">
+                                <connections>
+                                    <action selector="cameraButtonTapped:" destination="BYZ-38-t0r" id="vbp-sS-9X8"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="addButton" destination="Fo8-Rc-7WQ" id="Uuz-0M-JeZ"/>
+                        <outlet property="cameraButton" destination="AYd-l0-v7o" id="sUc-R3-xa5"/>
                         <outlet property="hideView" destination="wrf-JO-2pm" id="Srx-xK-r49"/>
-                        <outlet property="infoButton" destination="AYd-l0-v7o" id="qyx-u9-9Dk"/>
                         <outlet property="quantLabel" destination="UIJ-3M-FRU" id="VPC-zk-ugg"/>
                         <outlet property="saveButton" destination="XiU-xc-J4D" id="p7L-hU-kxH"/>
                         <outlet property="stepper" destination="5qK-7B-3Lp" id="GSo-9E-xan"/>
@@ -441,7 +445,7 @@
         <image name="BlueUnselectedButton" width="153.33332824707031" height="16.333333969116211"/>
         <image name="GreenSelectedButton" width="153.33332824707031" height="16.333333969116211"/>
         <image name="GreenUnselectedButton" width="153.33332824707031" height="16.333333969116211"/>
-        <image name="info.circle" catalog="system" width="64" height="60"/>
+        <image name="camera" catalog="system" width="64" height="48"/>
         <image name="xmark" catalog="system" width="64" height="56"/>
     </resources>
 </document>

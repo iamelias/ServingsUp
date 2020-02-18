@@ -12,13 +12,14 @@ import Foundation
 import CoreData
 
 
-class DishController: UIViewController, UITextFieldDelegate {
+class DishController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var quantLabel: UILabel!
     @IBOutlet weak var hideView: UIView!
     @IBOutlet weak var addButton: UIBarButtonItem!
     @IBOutlet weak var infoButton: UIBarButtonItem!
+    @IBOutlet weak var cameraButton: UIBarButtonItem!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var stepper: UIStepper!
     
@@ -32,6 +33,8 @@ class DishController: UIViewController, UITextFieldDelegate {
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
+    var originalPhoto: UIImage! //storing original non-meme image
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +57,10 @@ class DishController: UIViewController, UITextFieldDelegate {
             saveButton.title = "New"
             saveButton.isEnabled = true
         }
+    }
+    
+     override func viewWillAppear(_ animated: Bool) {
+            cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera) //disabling camera button if camera isn't available
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -327,6 +334,22 @@ class DishController: UIViewController, UITextFieldDelegate {
         self.dismiss(animated: true, completion: nil) //dismissing alert at background tap
     }
     
+    func pickImageWith(sourceType: UIImagePickerController.SourceType) { //opens album/camera for image pick
+         let pickImage = UIImagePickerController() //picking image
+         pickImage.delegate = self
+         pickImage.sourceType = sourceType
+         present(pickImage, animated:true, completion:nil)
+     }
+     
+     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+         if let image = info[.originalImage] as? UIImage {
+            //imagePickerView.image = image
+             self.originalPhoto = image//storing image in property for save method
+             dismiss(animated: true, completion: nil) //closes image picker when image is selected
+             
+         }
+     }
+    
     
     
     //MARK: IBACTIONS - START
@@ -344,6 +367,9 @@ class DishController: UIViewController, UITextFieldDelegate {
         dishes[dishes.count-1].editedServings = quantLabel.text
         DatabaseController.saveContext()
         tableView.reloadData()
+    }
+    @IBAction func cameraButtonTapped(_ sender: Any) {
+        pickImageWith(sourceType: UIImagePickerController.SourceType.camera)
     }
     
     @IBAction func addButtonTapped(_ sender: Any) {
