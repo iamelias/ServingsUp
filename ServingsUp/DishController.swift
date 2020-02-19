@@ -302,6 +302,13 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tab.allDishes = dishes
     }
     
+    func saveImage() {
+        let convertedPhoto = originalPhoto.pngData()
+        dishes[dishes.count-1].image = convertedPhoto
+        DatabaseController.saveContext()
+        tab.allDishes = dishes
+    }
+    
     func rearrangeDishes() {
        // print("RRRRRRR rearranged called")
         dishes = tab.allDishes
@@ -345,6 +352,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
          if let image = info[.originalImage] as? UIImage {
             //imagePickerView.image = image
              self.originalPhoto = image//storing image in property for save method
+            saveImage()
              dismiss(animated: true, completion: nil) //closes image picker when image is selected
              
          }

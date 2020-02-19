@@ -168,6 +168,8 @@ class BookController: UIViewController {
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
     }
     
+
+    
     func createDish(_ dishName: String) -> CoreDish { // This function creates a dish
         let newDish = CoreDish()
         newDish.name = dishName
@@ -193,6 +195,8 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        tableView.rowHeight = 90
+        
         if searching {
             return searchDishes.count
         }
@@ -207,7 +211,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
-        
         if searching {
         cell?.textLabel?.text = searchDishes[indexPath.row]
            // cell?.isEditing = false
@@ -215,6 +218,20 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
             //searching = false
+
+            cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
+ 
+            if StringDictionary[coreDishStrings[indexPath.row]]?.image != nil {
+                print("image is not present")
+                if let convertedImage = UIImage(data: StringDictionary[coreDishStrings[indexPath.row]]!.image!,scale: 1.0) {
+                 cell?.imageView?.image = convertedImage
+                 }
+                
+            }
+            else {
+            print("using default image")
+            }
+ 
         }
         
         return cell!
