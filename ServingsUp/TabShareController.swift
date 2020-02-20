@@ -22,5 +22,6 @@ class TabShareController: UITabBarController {
     var selectedDish: CoreDish! //assigned value when user selects cell in BookController, used in rearrange method in DishController
     var returning = false
     var deleting = false
+    var tapped = false
 
 }

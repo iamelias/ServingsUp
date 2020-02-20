@@ -91,6 +91,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             navigationItem.title = "Untitled"
         }
         
+        if navigationItem.title != "Untitled" {
+            saveButton.title = "New"
+           // tab.returning = false
+        }
+        
 
     }
 
@@ -335,7 +340,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         tab.allDishes = dishes
     }
-    
+    //
     @objc func alertBackgroundTapped()
     {
         self.dismiss(animated: true, completion: nil) //dismissing alert at background tap
@@ -473,6 +478,7 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

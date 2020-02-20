@@ -36,10 +36,9 @@ class BookController: UIViewController {
         let dishHolder1 = dishes
         tab.allDishes = dishHolder1
         
-        let newdishes = dishes.filter{$0.name != nil}
+        let newdishes = dishes.filter{$0.name != nil && $0.name != "Untitled"}
 
         for i in 0..<newdishes.count {
-            //dishes.append(newdishes[i])
             coreDishStrings.append(newdishes[i].name ?? "Nil")
             StringDictionary[coreDishStrings[i]] = newdishes[i]
         }
@@ -69,7 +68,6 @@ class BookController: UIViewController {
             return
         }
         checkNilDish()
-        //checkCore()
     }
     
     func setUpCoreString() {
@@ -95,23 +93,17 @@ class BookController: UIViewController {
     func checkNilDish() { // will remove all nils in dishes after fetch if any
         for i in 0..<dishes.count {
             if dishes[i].name == nil || dishes[i].name == "Untitled" {
-                //print("CheckNil is true")
-                //dishes.remove(at: i)
             }
         }
     }
     
     func stringNameDishes() {
-
-//        coreDishStrings = dishes.map{$0.name ?? "Empty"} // converts all dishObject names into string elements in new array
         
         guard dishes.count != 0 else {return}
         for i in 0...dishes.count - 1 { //for every object in dish
             guard dishes[i].name != nil else { continue} //if dish is not nil
             dishStrings[i].append(dishes[i].name!) //append dish string name to dishStrings array
         }
-        
-       // print(coreDishStrings)
     }
     
     func deleteCoreDishes() {
@@ -120,7 +112,6 @@ class BookController: UIViewController {
             DatabaseController.saveContext()
         }
     }
-    
     
     func saveCoreDish(_ dish: CoreDish) { //saving added dish to core data
         var coreDish = CoreDish(context: context)
@@ -201,10 +192,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             return searchDishes.count
         }
         else {
-//            if coreDishStrings.last == "Untitled" {
-//                dishes = []
-//                return 0
-//            }
             return coreDishStrings.count //number of dish objects from core data
         }
     }
@@ -213,11 +200,8 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
         if searching {
         cell?.textLabel?.text = searchDishes[indexPath.row]
-           // cell?.isEditing = false
-           // searching = false
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
-            //searching = false
 
             cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
  
@@ -238,10 +222,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //save selected dish index path to acess in dish view controller
-//        let dishHolder = dishes
-//        tab.allDishes = dishHolder
-        //print("*****\(dishes[indexPath.row])")
         
         tableView.reloadData()
         
@@ -250,42 +230,24 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             for i in 0..<dishes.count {
                 if searchDishes[indexPath.row] == dishes[i].name {
                     tab.selectedDish = StringDictionary[searchDishes[indexPath.row]]
-                   //tab.selectedDish = dishes[i]
-                    print(tab.selectedDish.name ?? "nil")
+        
                 }
                 
             }
         }
         
-        for i in 0..<dishes.count {
-          //  print("&&&&&&& \(dishes[i].name ?? "nil")")
-        }
         if !searching {
             tab.selectedDish = StringDictionary[coreDishStrings[indexPath.row]]
-       // tab.selectedDish = dishes[indexPath.row] //setting the selectedDish in TabShareController
-            print(StringDictionary)
         }
         tab.returning = true
         tabBarController?.selectedIndex = 0
     }
-    
-    
-//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-//        if searching {
-//            return UITableViewCell.EditingStyle.none
-//        }
-//
-//        return UITableViewCell.EditingStyle.delete
-//    }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if searching {
             for i in 0..<dishes.count {
-                //print(indexPath.row)
-               // print(searchDishes[indexPath.row])
                 if dishes[i].name == searchDishes[indexPath.row] {
-                   // print("##### \(dishes[i].name)")
                     deleteCoreData(dishes[i])
                     dishes.remove(at: i)
                     break
@@ -297,12 +259,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             
             searching = false
             searchBar.text = ""
-//            tab.allDishes = dishes
-//            tab.selectedDish = dishes[dishes.count-1]
             tableView.reloadData()
-            for i in 0..<dishes.count {
-             //   print("****** \(dishes[i].name ?? "Nil")")
-            }
             coreDishStrings = coreDishStrings.filter{$0 != "nil"}
                 let newDish = dishes
                dishes = newDish.filter{$0.name != nil}
@@ -315,19 +272,22 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         
 
         if !searching {
-        coreDishStrings.remove(at: indexPath.row) //removing from tableview array
-        deleteCoreData(dishes[indexPath.row]) //deleting from core data
-        dishes.remove(at: indexPath.row) //removing from array of dishes
+            
+            for i in 0..<dishes.count {
+                if dishes[i].name == coreDishStrings[indexPath.row]{
+                    deleteCoreData(dishes[i])
+                    dishes.remove(at: i)
+                    coreDishStrings.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
+                    break
+                }
+            }
         }
-        tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
-        tableView.reloadData()
         let dishHolder = dishes
         tab.deleting = true
         tab.allDishes = dishHolder
-        //deleteBlank()
-//***********
-      //   dishes = dishes.filter{$0.name != nil}
         tableView.reloadData()
+        return
     }
 }
 
