@@ -34,7 +34,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         return tabBarController as! TabShareController
     }
     var originalPhoto: UIImage! //storing original non-meme image
-
+    var checker: Bool = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,11 +66,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     override func viewDidAppear(_ animated: Bool) {
         
         if dishes.last?.name != navigationItem.title {
-//            let newDish = CoreDish()
-//            dishes.append(newDish)
-            defaultView()
-        }
-        if dishes.last?.name != navigationItem.title {
+            defaultView() //necessary
             dishes = tab.allDishes
             navigationItem.title = dishes.last?.name
             fetchIngredients()
@@ -95,8 +91,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             saveButton.title = "New"
            // tab.returning = false
         }
-        
-
+//        hideView.isHidden = false
     }
 
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
@@ -173,7 +168,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
           do {
               ingredients = try context.fetch(ingredRequest) //storing fetched ingredients in ingredients
-            //print("fetched ingredients count: \(ingredients.count)")
           }
             
           catch{
@@ -339,6 +333,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
         }
         tab.allDishes = dishes
+        
+        if ingredients.count == 0 && dishes.count != 0 {
+            clearCoreIngredients()
+        }
     }
     //
     @objc func alertBackgroundTapped()
@@ -363,10 +361,42 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
          }
      }
     
+    func stringCountCheck(_ value: String?) {
+        if value!.count == 0 {
+            showAlert(selectedAlert: ("Error","Dish needs a name"))
+            checker = false
+        }
+        else if value!.count>10 {
+            showAlert(selectedAlert:("Error","Enter a shorter name"))
+            checker = false
+        }
+        else {
+            checker = true
+            return
+        }
+    }
+    
+    func showAlert(selectedAlert: (String, String))  {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
+        
+        alert.addAction(ok)
+        present(alert, animated: true)
+        
+    }
+    
+    
+    
     
     
     //MARK: IBACTIONS - START
     @IBAction func stepperTapped(_ sender: UIStepper) { //Stepper changing quantLabel/number of servings
+        
+        guard dishes.count != 0 && ingredients.count != 0 else {
+            sender.value = 1.0
+            return
+        }
+        
         var number = 1
         number = Int(sender.value)
         quantLabel.text = String(number)
@@ -399,6 +429,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
         
+        guard dishes.count != 0 else {
+            return
+        }
+        
         deleteDish(dishes[dishes.count-1]) //will delete the viewing dish
         clearCoreIngredients() // will delete all ingredients that are in ingredients array
         defaultView()
@@ -416,6 +450,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         let submitAction = UIAlertAction(title: submitTitle, style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
+            self.stringCountCheck(answer.text)
+            guard self.checker == true else {
+                return
+            }
             self.savedDishName = answer.text ?? "Dish"
             guard self.savedDishName != "Dish" else {//Dish name is not allowed
                 let passMessage = "Choose a different name"
