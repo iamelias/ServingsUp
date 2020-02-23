@@ -49,7 +49,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         fetchDishes() // getting all dishes in core data
         fetchIngredients() // getting all ingredients of last created entity
         tableView.reloadData() //necessary?
-//        clearCoreIngredients()
 
         //tabBarController?.selectedIndex = 1 //If wanting to display BookController first //use with core data when determining if there is a saved dish
         
@@ -261,6 +260,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         stepper.value = 1.0
         
         //deleteIngredientsCore()
+//        let emptyDish = CoreDish()
+//        emptyDish.name = navigationItem.title
+//        emptyDish.creationDate = Date()
+//        emptyDish.editedServings = "1"
+//        dishes.append(emptyDish)
         tableView.reloadData()
     }
     
@@ -299,6 +303,19 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewDidDisappear(_ animated: Bool) {
         tab.allDishes = dishes
+        print("ViewDidDisappear called")
+        
+
+        
+//        if dishes.count != 0 && navigationItem.title == "Untitled" {
+//            print("Clearing ingredients at viewWillDisappear")
+//            deleteIngredientsCore()
+//        }
+//
+//        if dishes.count == 0 && navigationItem.title == "Untitled" {
+//            return
+//        }
+
     }
     
     func saveImage() {
@@ -333,11 +350,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
         }
         tab.allDishes = dishes
-        
-        if ingredients.count == 0 && dishes.count != 0 {
-            clearCoreIngredients()
-        }
     }
+
     //
     @objc func alertBackgroundTapped()
     {
