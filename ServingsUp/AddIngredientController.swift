@@ -27,6 +27,7 @@ class AddIngredientController: UIViewController {
     var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","ml","gallon"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
     var selectedUnit: String = "" //unit selected with pickerview
+    var checker = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +45,12 @@ class AddIngredientController: UIViewController {
     }
     
     @IBAction func addButtonTapped(_ sender: Any) {
+        stringCountCheck(textField.text)
+        stringCountCheck(amountTextField.text)
+        guard checker == true else {
+            checker = true
+            return
+        }
        createIngredient()
         dismiss(animated: true)
     }
@@ -67,6 +74,7 @@ class AddIngredientController: UIViewController {
     func createIngredient() { //creating Ingredient object to be sent back to DishController
         let ingredient = Ingredient()
         ingredient.name = textField.text! //ingredient name
+        //stringCountCheck(ingredient.name)
         let testServings = Int(servingsNumLabel!.text!)
         ingredient.servings = Int(testServings ?? 1)   //storing initial servingsNum as an int
         let testAmount = Double(amountTextField!.text!)
@@ -75,6 +83,32 @@ class AddIngredientController: UIViewController {
         
         chosenFood.getIngredient(food: ingredient)
     }
+    
+    func showAlert(selectedAlert: (String, String))  {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
+        
+        alert.addAction(ok)
+        present(alert, animated: true)
+        
+    }
+    
+    func stringCountCheck(_ value: String?) {
+        if value!.count == 0 {
+            showAlert(selectedAlert: ("Error","Neither name or amount can be empty"))
+            checker = false
+        }
+        else if value!.count>15 {
+            showAlert(selectedAlert:("Error","Enter a shorter name"))
+            checker = false
+        }
+        else {
+            checker = true
+            return
+        }
+    }
+    
+    
 }
 
 extension AddIngredientController: UITextFieldDelegate {

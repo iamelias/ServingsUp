@@ -56,6 +56,22 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             saveButton.title = "New"
             saveButton.isEnabled = true
         }
+        guard dishes.count>=1 else{return}
+        for i in 0..<dishes.count-1 {
+            print("Hello")
+            if dishes[i].name == "Untitled" {
+                print("Hello2")
+            context.delete(dishes[i])
+            }
+        }
+        
+        DatabaseController.saveContext()
+
+        dishes = dishes.filter{$0.name != "Untitled"}
+        dishes = dishes.filter{$0.name != nil}
+        DatabaseController.saveContext()
+        
+        tableView.reloadData()
     }
     
      override func viewWillAppear(_ animated: Bool) {
@@ -64,8 +80,12 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewDidAppear(_ animated: Bool) {
         
+        for i in 0..<dishes.count {
+            print(dishes[i].name)
+        }
+         
         if dishes.last?.name != navigationItem.title {
-            defaultView() //necessary
+            //defaultView() //necessary
             dishes = tab.allDishes
             navigationItem.title = dishes.last?.name
             fetchIngredients()
@@ -90,7 +110,12 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             saveButton.title = "New"
            // tab.returning = false
         }
+        else {
+            saveButton.title = "Save"
+            saveButton.isEnabled = true
+        }
 //        hideView.isHidden = false
+        print("((((((( \(dishes.count)")
     }
 
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
@@ -101,9 +126,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         do {
             dishes = try context.fetch(fetchRequest) //getting all saved dishes and setting equal to dishes
             
-            if !dishes.isEmpty {
-            if dishes[0].name == "Untitled" {
-                dishes.remove(at: 0)
+            if !dishes.isEmpty { // if dishes is not empty
+            if dishes[0].name == "Untitled" { //if first element is Untitled
+                dishes.remove(at: 0) //remove untitled
                 DatabaseController.saveContext()
             }
             }
@@ -123,6 +148,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                     return
                 }
         if let checkDish = dishes.last { //if last dish != nil, use last dish to update view
+                print("Made it here!!!!!")
                 updateView(checkDish) // if last dish is not nil change view to reflect the new dish
         }
                 let dishHolder = dishes
@@ -151,8 +177,12 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         hideView.isHidden = true // turn off hideView
 
         navigationItem.title = dishes.last?.name ?? "Untitled" //used last dish name as navTitle
+        print("Made it here 2")
+        print(selectedDish.editedServings)
+        print(selectedDish.name)
         stepper.value = Double(selectedDish.editedServings ?? "1") ?? 1.0 //updating stepper value and
         quantLabel.text = selectedDish.editedServings //stepper's label to reflect last dish's last settings.
+        print(quantLabel.text)
         DatabaseController.saveContext()
     }
       func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients array
@@ -160,7 +190,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
 
         let ingredRequest: NSFetchRequest<CoreIngredient> = CoreIngredient.fetchRequest()
         let predicate = NSPredicate(format: "dish == %@", dishes.last!) //%@ with ingredients that belong to the specified property dish. dish property is set when saving dish
-          ingredRequest.predicate = predicate
+        ingredRequest.predicate = predicate
           
           let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true ) // from oldest(top) to newest(bottom)
           ingredRequest.sortDescriptors = [sortDescriptor]
@@ -258,13 +288,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         hideView.isHidden = true
         quantLabel.text = "1"
         stepper.value = 1.0
-        
-        //deleteIngredientsCore()
-//        let emptyDish = CoreDish()
-//        emptyDish.name = navigationItem.title
-//        emptyDish.creationDate = Date()
-//        emptyDish.editedServings = "1"
-//        dishes.append(emptyDish)
+
         tableView.reloadData()
     }
     
@@ -366,9 +390,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
      }
      
      func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-         if let image = info[.originalImage] as? UIImage {
+        if let image = info[.originalImage] as? UIImage {
             //imagePickerView.image = image
-             self.originalPhoto = image//storing image in property for save method
+            self.originalPhoto = image//storing image in property for save method
+            //self.originalPhoto.imageOrientation = UIImageOriention
+           // self.originalPhoto.imageOrientation = up
             saveImage()
              dismiss(animated: true, completion: nil) //closes image picker when image is selected
              
@@ -422,6 +448,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         //update the stepper value and label in core data.
         dishes[dishes.count-1].editedServings = quantLabel.text
+        print(dishes[dishes.count-1].name!)
         DatabaseController.saveContext()
         tableView.reloadData()
     }
@@ -442,14 +469,23 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
-        
+        print("^^^^^^^^ \(dishes.count)")
         guard dishes.count != 0 else {
             return
         }
         
         deleteDish(dishes[dishes.count-1]) //will delete the viewing dish
+        navigationItem.title = "Untitled"
         clearCoreIngredients() // will delete all ingredients that are in ingredients array
-        defaultView()
+        let newDish = CoreDish(context: context)
+        newDish.name = "Untitled"
+        newDish.stepperValue = stepper.value
+        newDish.editedServings = quantLabel.text
+        saveButton.isEnabled = true
+        newDish.creationDate = Date()
+        dishes.append(newDish)
+        tableView.reloadData()
+        //defaultView()
     }
     //MARK: IBACTIONS - END
 }

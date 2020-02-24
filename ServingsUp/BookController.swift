@@ -18,6 +18,7 @@ class BookController: UIViewController {
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
+    var checker = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -130,6 +131,30 @@ class BookController: UIViewController {
     func deleteCoreData(_ selectedDish: CoreDish) { //deleting selected dish from Core Data
         context.delete(selectedDish)
         DatabaseController.saveContext()
+    }
+    
+    func stringCountCheck(_ value: String?) {
+        if value!.count == 0 {
+            showAlert(selectedAlert: ("Error","Dish needs a name"))
+            checker = false
+        }
+        else if value!.count>10 {
+            showAlert(selectedAlert:("Error","Enter a shorter name"))
+            checker = false
+        }
+        else {
+            checker = true
+            return
+        }
+    }
+    
+    func showAlert(selectedAlert: (String, String))  {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
+        
+        alert.addAction(ok)
+        present(alert, animated: true)
+        
     }
 
     
