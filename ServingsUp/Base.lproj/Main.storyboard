@@ -282,14 +282,14 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf5-Am-mmT">
+                                <rect key="frame" x="0.0" y="305" width="375" height="216"/>
+                            </pickerView>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="50" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WkR-Z9-aHH">
                                 <rect key="frame" x="16" y="305" width="343" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf5-Am-mmT">
-                                <rect key="frame" x="0.0" y="399" width="375" height="216"/>
-                            </pickerView>
                             <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txS-oI-9id">
                                 <rect key="frame" x="308" y="354" width="51" height="30"/>
                                 <state key="normal" title="Volume"/>
@@ -345,6 +345,7 @@
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="TS8-OQ-2F2" secondAttribute="trailing" constant="143" id="Cgv-dt-un2"/>
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="v7M-vc-dEH" secondAttribute="trailing" constant="141" id="Dva-nj-2dv"/>
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="1ad-Zn-jlK" secondAttribute="trailing" constant="16" id="ES9-4r-vpq"/>
+                            <constraint firstItem="txS-oI-9id" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Cw3-rl-SyX" secondAttribute="trailing" constant="8" symbolic="YES" id="Eb2-ku-zoE"/>
                             <constraint firstItem="v7M-vc-dEH" firstAttribute="leading" secondItem="lkb-EV-6zF" secondAttribute="leading" constant="140" id="FFM-T6-uLv"/>
                             <constraint firstItem="0o2-gH-dJV" firstAttribute="leading" secondItem="lkb-EV-6zF" secondAttribute="leading" constant="153" id="Fia-wY-5S2"/>
                             <constraint firstItem="fNA-eF-6Kg" firstAttribute="top" secondItem="v7M-vc-dEH" secondAttribute="bottom" constant="17.670000000000002" id="GYe-41-gvI"/>
@@ -354,13 +355,13 @@
                             <constraint firstItem="Wf5-Am-mmT" firstAttribute="trailing" secondItem="lkb-EV-6zF" secondAttribute="trailing" id="Qa5-9t-h9O"/>
                             <constraint firstItem="TS8-OQ-2F2" firstAttribute="leading" secondItem="lkb-EV-6zF" secondAttribute="leading" constant="143" id="RdR-Qy-9bc"/>
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="WkR-Z9-aHH" secondAttribute="trailing" constant="16" id="Rz4-zU-idf"/>
-                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="WkR-Z9-aHH" secondAttribute="bottom" constant="60" id="Std-n1-MfJ"/>
+                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="WkR-Z9-aHH" secondAttribute="bottom" constant="-34" id="Std-n1-MfJ"/>
                             <constraint firstItem="0o2-gH-dJV" firstAttribute="top" secondItem="fNA-eF-6Kg" secondAttribute="bottom" constant="15.67" id="Yfp-uF-SM1"/>
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="fNA-eF-6Kg" secondAttribute="trailing" constant="141" id="ZWh-Mp-UVD"/>
                             <constraint firstItem="qhr-Pa-mkH" firstAttribute="leading" secondItem="lkb-EV-6zF" secondAttribute="leading" constant="16" id="dBV-NQ-UdI"/>
-                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="txS-oI-9id" secondAttribute="bottom" constant="15" id="eek-1C-acw"/>
-                            <constraint firstItem="qhr-Pa-mkH" firstAttribute="top" secondItem="Wf5-Am-mmT" secondAttribute="bottom" constant="96" id="eu4-2Q-5vP"/>
-                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="Cw3-rl-SyX" secondAttribute="bottom" constant="15" id="gto-Bb-P1c"/>
+                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="txS-oI-9id" secondAttribute="bottom" constant="-79" id="eek-1C-acw"/>
+                            <constraint firstItem="qhr-Pa-mkH" firstAttribute="top" secondItem="Wf5-Am-mmT" secondAttribute="bottom" constant="190" id="eu4-2Q-5vP"/>
+                            <constraint firstItem="Wf5-Am-mmT" firstAttribute="top" secondItem="Cw3-rl-SyX" secondAttribute="bottom" constant="-79" id="gto-Bb-P1c"/>
                             <constraint firstItem="v7M-vc-dEH" firstAttribute="top" secondItem="1ad-Zn-jlK" secondAttribute="bottom" constant="14" id="hcQ-wo-h4F"/>
                             <constraint firstItem="lkb-EV-6zF" firstAttribute="trailing" secondItem="0o2-gH-dJV" secondAttribute="trailing" constant="154" id="jB0-it-VJi"/>
                             <constraint firstItem="WkR-Z9-aHH" firstAttribute="leading" secondItem="lkb-EV-6zF" secondAttribute="leading" constant="16" id="kQe-WN-Nii"/>

@@ -225,10 +225,28 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
         if searching {
         cell?.textLabel?.text = searchDishes[indexPath.row]
+        cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
+            
+            if StringDictionary[searchDishes[indexPath.row]]?.image != nil {
+                print("image is not present")
+                if let convertedImage = UIImage(data: StringDictionary[searchDishes[indexPath.row]]!.image!,scale: 1.0) {
+                   // cell?.imageView?.contentMode = .scaleAspectFit
+                    cell?.imageView?.image = convertedImage
+                 }
+                
+            }
+            else {
+            print("using default image")
+            }
+            
+            
+        
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
 
             cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
+            
+            
  
             if StringDictionary[coreDishStrings[indexPath.row]]?.image != nil {
                 print("image is not present")

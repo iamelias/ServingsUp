@@ -385,12 +385,13 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func pickImageWith(sourceType: UIImagePickerController.SourceType) { //opens album/camera for image pick
          let pickImage = UIImagePickerController() //picking image
          pickImage.delegate = self
-         pickImage.sourceType = sourceType
+        pickImage.sourceType = .camera
+        pickImage.allowsEditing = true
          present(pickImage, animated:true, completion:nil)
      }
      
      func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage {
+        if let image = info[.editedImage] as? UIImage {
             //imagePickerView.image = image
             self.originalPhoto = image//storing image in property for save method
             //self.originalPhoto.imageOrientation = UIImageOriention
