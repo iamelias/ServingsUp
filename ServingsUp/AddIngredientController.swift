@@ -26,7 +26,7 @@ class AddIngredientController: UIViewController {
     var weightUnitArray: [String] = ["mg", "g", "lb"] //tag 1
     var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","ml","gallon"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
-    var selectedUnit: String = "" //unit selected with pickerview
+    var selectedUnit: String = "g" //unit selected with pickerview
     var checker = true
     
     override func viewDidLoad() {
@@ -41,6 +41,7 @@ class AddIngredientController: UIViewController {
         
         view.addGestureRecognizer(tapGesture)
         
+        unitPicker.selectRow(1, inComponent: 0, animated: true)
     }
     
     @objc func action() {
