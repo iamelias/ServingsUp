@@ -26,6 +26,7 @@ class BookController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
+        tableView.keyboardDismissMode = .onDrag
     }
     
     override func viewDidAppear(_ animated: Bool) {

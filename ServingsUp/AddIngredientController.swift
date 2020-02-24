@@ -36,6 +36,15 @@ class AddIngredientController: UIViewController {
         textField.delegate = self
         amountTextField.delegate = self
         selectedUnitArray = weightUnitArray
+        
+        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //when view is tapped picker/keyboard is dismissed
+        
+        view.addGestureRecognizer(tapGesture)
+        
+    }
+    
+    @objc func action() {
+        view.endEditing(true)
     }
     
     @IBAction func stepperUsed(_ sender: UIStepper) {
