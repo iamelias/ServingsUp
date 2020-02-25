@@ -51,8 +51,8 @@
                                     <action selector="stepperTapped:" destination="BYZ-38-t0r" eventType="valueChanged" id="D2H-JN-mzz"/>
                                 </connections>
                             </stepper>
-                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NB4-wN-ZbH">
-                                <rect key="frame" x="140" y="638" width="94" height="20.333333333333371"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="NB4-wN-ZbH">
+                                <rect key="frame" x="140" y="638" width="102" height="20.333333333333371"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Servings: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pkZ-oc-S4z">
                                         <rect key="frame" x="0.0" y="0.0" width="85" height="20.333333333333332"/>
@@ -60,8 +60,8 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UIJ-3M-FRU">
-                                        <rect key="frame" x="85" y="0.0" width="9" height="20.333333333333332"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UIJ-3M-FRU">
+                                        <rect key="frame" x="93" y="0.0" width="9" height="20.333333333333332"/>
                                         <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -71,7 +71,6 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="NB4-wN-ZbH" secondAttribute="trailing" constant="141" id="4rY-eq-jmD"/>
                             <constraint firstItem="NB4-wN-ZbH" firstAttribute="top" secondItem="Tux-3V-AiP" secondAttribute="bottom" constant="8" id="BMD-xu-zae"/>
                             <constraint firstItem="Tux-3V-AiP" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ClU-zO-MgC"/>
                             <constraint firstItem="5qK-7B-3Lp" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="140" id="Q1p-VD-6fM"/>

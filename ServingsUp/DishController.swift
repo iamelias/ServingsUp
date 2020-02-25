@@ -395,7 +395,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             showAlert(selectedAlert: ("Error","Dish needs a name"))
             checker = false
         }
-        else if value!.count>10 {
+        else if value!.count>25 {
             showAlert(selectedAlert:("Error","Enter a shorter name"))
             checker = false
         }

@@ -60,11 +60,29 @@ class AddIngredientController: UIViewController {
     }
     
     @IBAction func addButtonTapped(_ sender: Any) {
-        stringCountCheck(textField.text)
-        stringCountCheck(amountTextField.text)
-        guard checker == true else {
-            checker = true
+       let firstCheck = stringCountCheck(textField.text)
+        if firstCheck == false {
+        textField.shake()
+        }
+        guard firstCheck == true else { return}
+      
+       let secondCheck = stringCountCheck(amountTextField.text)
+        if secondCheck == false {
+        amountTextField.shake()
+        }
+        guard firstCheck == true && secondCheck == true else {
+            //checker = true
             return
+        }
+        print("***** \(secondCheck)")
+        if firstCheck == false || secondCheck == false {
+            return
+        }
+        
+        
+        let amountFormatCheck = decimalCheck(amountTextField.text ?? "a")
+        guard amountFormatCheck == true else {
+            return 
         }
        createIngredient()
         dismiss(animated: true)
@@ -85,6 +103,10 @@ class AddIngredientController: UIViewController {
         unitPicker.reloadAllComponents()
     }
     
+    func hapticError() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
+    }
     
     func createIngredient() { //creating Ingredient object to be sent back to DishController
         let ingredient = Ingredient()
@@ -108,22 +130,40 @@ class AddIngredientController: UIViewController {
         
     }
     
-    func stringCountCheck(_ value: String?) {
+    func stringCountCheck(_ value: String?) -> Bool {
+        print("^^^^ \(value?.count ?? 999999)")
+        
         if value!.count == 0 {
             showAlert(selectedAlert: ("Error","Neither name or amount can be empty"))
-            checker = false
+            //textField.shake()
+            hapticError()
+            print("returning false")
+            return false
+           // checker = false
         }
-        else if value!.count>15 {
+        else if value!.count>20 {
             showAlert(selectedAlert:("Error","Enter a shorter name"))
-            checker = false
+            
+            hapticError()
+            print("returning false")
+            return false
+            //checker = false
         }
-        else {
-            checker = true
-            return
-        }
+
+        return true
     }
     
+    func decimalCheck(_ value: String) -> Bool {
+        let checkNum = Double(value)
+        if checkNum == nil {
+            showAlert(selectedAlert: ("Error","Amount can only be in decimal notation"))
+            return false
+        }
+        
+        return true
+    }
     
+
 }
 
 extension AddIngredientController: UITextFieldDelegate {
@@ -132,6 +172,18 @@ extension AddIngredientController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
 }
+}
+
+extension UITextField {
+    func shake() { //setting up shake animation for alert error
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.repeatCount = 2
+        animation.duration = 0.05
+        animation.autoreverses = true
+        animation.fromValue = CGPoint(x: self.center.x - 4.0, y: self.center.y)
+        animation.toValue = CGPoint(x: self.center.x + 4.0, y: self.center.y)
+        layer.add(animation, forKey: "position")
+    }
 }
 
 extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource {
