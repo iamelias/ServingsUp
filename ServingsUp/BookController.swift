@@ -26,6 +26,7 @@ class BookController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
+        
         tableView.keyboardDismissMode = .onDrag
     }
     
@@ -358,6 +359,8 @@ extension BookController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searching = false
         searchBar.text = ""
+        searchBar.resignFirstResponder()
+        
         tableView.reloadData() //so table changes with cancel
     }
 }

@@ -16,7 +16,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var quantLabel: UILabel!
-    @IBOutlet weak var hideView: UIView!
     @IBOutlet weak var addButton: UIBarButtonItem!
     @IBOutlet weak var infoButton: UIBarButtonItem!
     @IBOutlet weak var cameraButton: UIBarButtonItem!
@@ -40,10 +39,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-        hideView.isHidden = false //blocking screen with hideview (*view)
         navigationItem.title = "Untitled"
-        hideView.backgroundColor = .gray //hideview is gray (*view)
-        hideView.alpha = 0.5 //hide view is 50% transparent (*view)
         saveButton.isEnabled = false // save button isn't enabled initially. need to add 1 ingredient first
         defaultView()
         fetchDishes() // getting all dishes in core data
@@ -114,7 +110,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             saveButton.title = "Save"
             saveButton.isEnabled = true
         }
-//        hideView.isHidden = false
         print("((((((( \(dishes.count)")
     }
 
@@ -174,7 +169,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     func updateView(_ selectedDish: CoreDish) { //change in view after fetch to show last in fetched array
         guard dishes.count != 0 else { return } // if dishes count is 0 return
-        hideView.isHidden = true // turn off hideView
 
         navigationItem.title = dishes.last?.name ?? "Untitled" //used last dish name as navTitle
         print("Made it here 2")
@@ -205,10 +199,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
           }
         
         checkNilIngredient() // checking/removing any nil ingredients
-        
-        if !ingredients.isEmpty { // if there is at least 1 ingredient, hideView will disappear
-            hideView.isHidden = true
-        }
         
         tableView.reloadData() //reload table to show ingredients
       }
@@ -285,7 +275,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func defaultView() { //default view setting. If no dish is in dishes array
         navigationItem.title = "Untitled"
         saveButton.title = "Save"
-        hideView.isHidden = true
         quantLabel.text = "1"
         stepper.value = 1.0
 
@@ -305,7 +294,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         ingredients = []
         navigationItem.title = title
         saveButton.title = "Save"
-        hideView.isHidden = true
         quantLabel.text = "1"
         stepper.value = 1.0
         
@@ -585,7 +573,6 @@ extension DishController: AddIngredientDelegate {
 
     func getIngredient(food: Ingredient) { //Getting new ingredient to add to dish
         saveButton.isEnabled = true //hideview disappears and save button is enabled when getting new ingredient
-        hideView.isHidden = true
 
        // print("food amount: \(food.amount)")
        // print("food servings: \(food.servings)")

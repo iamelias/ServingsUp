@@ -35,11 +35,15 @@ class AddIngredientController: UIViewController {
         unitPicker.dataSource = self
         textField.delegate = self
         amountTextField.delegate = self
+        
         selectedUnitArray = weightUnitArray
         
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //when view is tapped picker/keyboard is dismissed
         
         view.addGestureRecognizer(tapGesture)
+        
+        let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action))
+        view.addGestureRecognizer(swipeGesture)
         
         unitPicker.selectRow(1, inComponent: 0, animated: true)
     }
@@ -47,6 +51,7 @@ class AddIngredientController: UIViewController {
     @objc func action() {
         view.endEditing(true)
     }
+    
     
     @IBAction func stepperUsed(_ sender: UIStepper) {
         var number = 0
