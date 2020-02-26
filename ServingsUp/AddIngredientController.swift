@@ -36,16 +36,21 @@ class AddIngredientController: UIViewController {
         textField.delegate = self
         amountTextField.delegate = self
         
+        
         selectedUnitArray = weightUnitArray
         
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //when view is tapped picker/keyboard is dismissed
         
         view.addGestureRecognizer(tapGesture)
+        // unitPicker.resignFirstResponder()
         
         let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action))
         view.addGestureRecognizer(swipeGesture)
         
         unitPicker.selectRow(1, inComponent: 0, animated: true)
+        if unitPicker.isUserInteractionEnabled {
+            view.endEditing(true)
+        }
     }
     
     @objc func action() {
@@ -93,7 +98,7 @@ class AddIngredientController: UIViewController {
     }
     
     @IBAction func unitButtonTapped(_ sender: UIButton) {
-        
+        view.endEditing(true)
         switch sender.tag {
         case 1: selectedUnitArray = weightUnitArray
         case 2: selectedUnitArray = volumeUnitArray
@@ -153,12 +158,14 @@ class AddIngredientController: UIViewController {
         return true
     }
     
+    
     func decimalCheck(_ value: String) -> Bool {
         let checkNum = Double(value)
         if checkNum == nil {
             showAlert(selectedAlert: ("Error","Amount can only be in decimal notation"))
             return false
         }
+        
         
         return true
     }
@@ -202,7 +209,9 @@ extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource 
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedUnit = selectedUnitArray[row]
+        //view.begin
+        view.endEditing(true)
+        
     }
-    
 }
 
