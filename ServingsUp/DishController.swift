@@ -47,9 +47,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tableView.reloadData() //necessary?
 
         //tabBarController?.selectedIndex = 1 //If wanting to display BookController first //use with core data when determining if there is a saved dish
-        
+        cameraButton.isEnabled = true //enabling camera if navTitle does not equal untitled
         if navigationItem.title != "Untitled" {
             saveButton.title = "New"
+            cameraButton.isEnabled = false //disabling camera if navTitle = "Untitled"
             saveButton.isEnabled = true
         }
         guard dishes.count>=1 else{return}
@@ -68,10 +69,16 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         DatabaseController.saveContext()
         
         tableView.reloadData()
+        
+
     }
     
      override func viewWillAppear(_ animated: Bool) {
             cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera) //disabling camera button if camera isn't available
+        
+        if navigationItem.title == "Untitled" {
+            cameraButton.isEnabled = false
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -107,10 +114,17 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
            // tab.returning = false
         }
         else {
+            cameraButton.isEnabled = false
             saveButton.title = "Save"
             saveButton.isEnabled = true
         }
-        print("((((((( \(dishes.count)")
+
+//        if dishes[dishes.count-1].image != nil {
+//            cameraButton.tintColor = .systemGreen
+//        }
+//        else {
+//            cameraButton.tintColor = .none
+//        }
     }
 
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
@@ -171,12 +185,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         guard dishes.count != 0 else { return } // if dishes count is 0 return
 
         navigationItem.title = dishes.last?.name ?? "Untitled" //used last dish name as navTitle
-        print("Made it here 2")
-        print(selectedDish.editedServings)
-        print(selectedDish.name)
         stepper.value = Double(selectedDish.editedServings ?? "1") ?? 1.0 //updating stepper value and
         quantLabel.text = selectedDish.editedServings //stepper's label to reflect last dish's last settings.
-        print(quantLabel.text)
         DatabaseController.saveContext()
     }
       func fetchIngredients() { //fetching ingredients that belong to specific dish. Displays them by creation date storing, ingredients in ingredients array
@@ -301,6 +311,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
      
     func createDish(_ selectedDish: String) -> CoreDish { //create new dish function
+        cameraButton.tintColor = .none
         let newDish = CoreDish(context: context)
 //        let newDish = CoreDish()
         newDish.name = selectedDish
@@ -458,6 +469,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
+        cameraButton.tintColor = .none
+
+        saveButton.title = "Save"
         print("^^^^^^^^ \(dishes.count)")
         guard dishes.count != 0 else {
             return
@@ -473,6 +487,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         saveButton.isEnabled = true
         newDish.creationDate = Date()
         dishes.append(newDish)
+        
+        if navigationItem.title == "Untitled" {
+            cameraButton.isEnabled = false
+        }
         tableView.reloadData()
         //defaultView()
     }
