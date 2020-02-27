@@ -82,10 +82,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
-        for i in 0..<dishes.count {
-            print(dishes[i].name)
-        }
          
         if dishes.last?.name != navigationItem.title {
             //defaultView() //necessary
@@ -118,13 +114,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             saveButton.title = "Save"
             saveButton.isEnabled = true
         }
-
-//        if dishes[dishes.count-1].image != nil {
-//            cameraButton.tintColor = .systemGreen
-//        }
-//        else {
-//            cameraButton.tintColor = .none
-//        }
     }
 
     func fetchDishes() { //Getting all dishes in creation date order, storing in "dishes" global array Type: CoreDish. The purpose of fetching dishes to get the last dish in the array of dishes to use for ingredients
@@ -426,6 +415,59 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
     }
     
+    func renameAlert(selectedAlert: (String, String, String)) {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        alert.addTextField()
+        let rename = UIAlertAction(title: selectedAlert.2, style: .default){ [unowned alert] _ in
+           let answer = alert.textFields![0]
+               print("###### \(answer.text ?? "nil")")
+//               guard answer.text!.isEmpty else {
+//                   return
+//               }
+               self.dishes[self.dishes.count-1].name = answer.text!
+            print(self.dishes[self.dishes.count-1].name!)
+               DatabaseController.saveContext()
+            self.navigationItem.title = self.dishes[self.dishes.count-1].name
+               self.tab.allDishes = self.dishes
+           }
+           
+           alert.addAction(rename)
+           
+           present(alert, animated: true, completion:{ //setting up tap gesture recognizer
+               alert.view.superview?.isUserInteractionEnabled = true
+               alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+       }
+    
+    
+    func secondOptAlert(selectedAlert: (String, String, String)) {
+        print("in secondOPt")
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let rename = UIAlertAction(title: "Rename", style: .default){ (action: UIAlertAction) in
+            self.renameAlert(selectedAlert: ("Rename Dish", "Enter new name of this Dish", "Rename"))
+//            alert.addTextField()
+//        let answer = alert.textFields![0]
+//            print("###### \(answer.text ?? "nil")")
+//            guard answer.text!.isEmpty else {
+//                return
+//            }
+//            self.dishes[self.dishes.count-1].name = answer.text!
+//            DatabaseController.saveContext()
+//            self.tab.allDishes = self.dishes
+        }
+        
+        let new = UIAlertAction(title: "New", style: .default, handler: {(action: UIAlertAction)
+            in
+            self.createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
+        })
+        
+        alert.addAction(rename)
+        alert.addAction(new)
+        
+        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
+            alert.view.superview?.isUserInteractionEnabled = true
+            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+    }
+    
     func optionAlert(selectedAlert:(String, String, String)) {
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
@@ -435,8 +477,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         alert.addAction(cancel)
         alert.addAction(delete)
-            present(alert, animated: true)
-        }
+         //   present(alert, animated: true)
+        
+        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
+            alert.view.superview?.isUserInteractionEnabled = true
+            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+       
+    
+    }
         
     
     
@@ -477,11 +525,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
 
     @IBAction func saveButtonTapped(_ sender: Any) {
-        createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
+        secondOptAlert(selectedAlert: ("Create Dish", "Rename or Create New", "Rename"))
+      //  createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
         guard dishes.count != 0 else{return}
-        //showAlert(selectedAlert: ("Delete?", "Are you sure you want to delete this dish?"))
         optionAlert(selectedAlert: ("Delete Dish", "Are you sure you want to permanently delete this dish?", "Delete"))
     }
     

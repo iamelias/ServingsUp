@@ -364,3 +364,11 @@ extension BookController: UISearchBarDelegate {
         tableView.reloadData() //so table changes with cancel
     }
 }
+
+extension BookController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    
+        textField.resignFirstResponder()
+        return true
+}
+}
