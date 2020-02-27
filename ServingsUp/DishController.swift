@@ -269,6 +269,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
 
     func deleteDish(_ selectDish: CoreDish) { //deletes a selected dish from core data
+        guard dishes.count != 0 else{return}
         dishes.removeLast() // will remove last dish
         tab.allDishes.removeLast()
         context.delete(selectDish)
@@ -425,8 +426,18 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
     }
     
-    
-    
+    func optionAlert(selectedAlert:(String, String, String)) {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let delete = UIAlertAction(title: selectedAlert.2, style: .destructive, handler: {(action: UIAlertAction) in
+            self.deleting()
+        })
+        
+        alert.addAction(cancel)
+        alert.addAction(delete)
+            present(alert, animated: true)
+        }
+        
     
     
     //MARK: IBACTIONS - START
@@ -469,10 +480,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
+        guard dishes.count != 0 else{return}
+        //showAlert(selectedAlert: ("Delete?", "Are you sure you want to delete this dish?"))
+        optionAlert(selectedAlert: ("Delete Dish", "Are you sure you want to permanently delete this dish?", "Delete"))
+    }
+    
+    func deleting() {
         cameraButton.tintColor = .none
 
         saveButton.title = "Save"
-        print("^^^^^^^^ \(dishes.count)")
         guard dishes.count != 0 else {
             return
         }
@@ -494,6 +510,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tableView.reloadData()
         //defaultView()
     }
+    
+    
+    
     //MARK: IBACTIONS - END
 }
   //MARK: ALERT - START

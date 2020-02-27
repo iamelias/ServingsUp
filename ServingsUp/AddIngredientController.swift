@@ -127,6 +127,7 @@ class AddIngredientController: UIViewController {
     }
     
     func showAlert(selectedAlert: (String, String))  {
+        hapticError()
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
         
@@ -141,7 +142,7 @@ class AddIngredientController: UIViewController {
         if value!.count == 0 {
             showAlert(selectedAlert: ("Error","Neither name or amount can be empty"))
             //textField.shake()
-            hapticError()
+            //hapticError()
             print("returning false")
             return false
            // checker = false
@@ -149,7 +150,7 @@ class AddIngredientController: UIViewController {
         else if value!.count>20 {
             showAlert(selectedAlert:("Error","Enter a shorter name"))
             
-            hapticError()
+            //hapticError()
             print("returning false")
             return false
             //checker = false
@@ -162,7 +163,9 @@ class AddIngredientController: UIViewController {
     func decimalCheck(_ value: String) -> Bool {
         let checkNum = Double(value)
         if checkNum == nil {
+            amountTextField.shake()
             showAlert(selectedAlert: ("Error","Amount can only be in decimal notation"))
+            //hapticError()
             return false
         }
         

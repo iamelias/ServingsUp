@@ -278,7 +278,7 @@
                             <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wf5-Am-mmT">
                                 <rect key="frame" x="0.0" y="347" width="375" height="216"/>
                             </pickerView>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="50" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WkR-Z9-aHH">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="25" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="WkR-Z9-aHH">
                                 <rect key="frame" x="16" y="305" width="343" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
@@ -324,7 +324,7 @@
                                     <constraint firstAttribute="width" constant="94" id="YRk-M8-44N"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                <state key="normal" title="Weight" backgroundImage="UselectRectangle"/>
+                                <state key="normal" title="Mass" backgroundImage="UselectRectangle"/>
                                 <connections>
                                     <action selector="unitButtonTapped:" destination="J18-24-TC2" eventType="touchUpInside" id="OSr-yH-m1a"/>
                                 </connections>
