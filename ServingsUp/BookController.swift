@@ -367,16 +367,23 @@ extension BookController: UISearchBarDelegate {
         searchDishes = coreDishStrings.filter({$0.lowercased().prefix(searchText.count) == searchText.lowercased()})
         
         searching = true
+        
         tableView.reloadData() //so table changes with search
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searching = false
         searchBar.text = ""
-        searchBar.resignFirstResponder()
+        view.endEditing(true)
         
         tableView.reloadData() //so table changes with cancel
     }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+
 }
 
 extension BookController: UITextFieldDelegate {
