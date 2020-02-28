@@ -104,7 +104,9 @@ class AddIngredientController: UIViewController {
         case 2: selectedUnitArray = volumeUnitArray
         default: selectedUnitArray = weightUnitArray
         }
-        
+        if selectedUnitArray == volumeUnitArray {
+            selectedUnit = "tsp"
+        }
         unitPicker.reloadAllComponents()
     }
     

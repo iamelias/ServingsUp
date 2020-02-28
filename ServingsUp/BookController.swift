@@ -196,6 +196,20 @@ class BookController: UIViewController {
         return newDish
     }
     
+    func checkNameExists(_ name: String) { // checking if name already exists
+        for i in 0..<dishes.count {
+            if dishes[i].name == name {
+                print("Name already exists")
+                return
+            }
+        }
+    }
+    
+    func hapticError() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
+    }
+    
     @objc func alertBackgroundTapped()
     {
         self.dismiss(animated: true, completion: nil) //dismissing alert at background tap

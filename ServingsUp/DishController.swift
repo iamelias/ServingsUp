@@ -415,20 +415,35 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
     }
     
+    func hapticSuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
+    
+    func hapticError() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
+    }
+    
     func renameAlert(selectedAlert: (String, String, String)) {
+        var nameExists = false
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         alert.addTextField()
         let rename = UIAlertAction(title: selectedAlert.2, style: .default){ [unowned alert] _ in
            let answer = alert.textFields![0]
-               print("###### \(answer.text ?? "nil")")
-//               guard answer.text!.isEmpty else {
-//                   return
-//               }
+            nameExists = self.checkNameExists(answer.text ?? "nil")
+            guard nameExists == false && answer.text != "nil" else {
+                self.hapticError()
+                self.showAlert(selectedAlert: ("Error", "There is already a dish named \(answer.text!) please enter a new name"))
+                 return
+            }
+
                self.dishes[self.dishes.count-1].name = answer.text!
             print(self.dishes[self.dishes.count-1].name!)
                DatabaseController.saveContext()
             self.navigationItem.title = self.dishes[self.dishes.count-1].name
                self.tab.allDishes = self.dishes
+          //  self.hapticSuccess()
            }
            
            alert.addAction(rename)
@@ -438,6 +453,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
        }
     
+    func checkNameExists(_ name: String) -> Bool { // checking if name already exists
+        for i in 0..<dishes.count {
+            if dishes[i].name == name {
+                print("Name already exists")
+                return true //name found
+            }
+        }
+        return false //name doesn't already exits
+    }
     
     func secondOptAlert(selectedAlert: (String, String, String)) {
         print("in secondOPt")
