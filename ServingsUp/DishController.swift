@@ -605,6 +605,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
   //MARK: ALERT - START
     extension DishController {
     func createAlert(alertTitle: String, alertMessage: String) {
+        var nameExists = false
         let alert = UIAlertController(title: alertTitle , message: alertMessage, preferredStyle: .alert)
         alert.addTextField()
         var submitTitle = "Create"
@@ -617,6 +618,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             guard emptyStringCheck == false else {
                 return
             }
+            
+            nameExists = self.checkNameExists(answer.text ?? "nil")
+            guard nameExists == false && answer.text != "nil" else {
+                self.hapticError()
+                self.showAlert(selectedAlert: ("Error", "There is already a dish named \(answer.text!) please enter a new name"))
+                 return
+            }
+            
             self.stringCountCheck(answer.text)
             guard self.checker == true else {
                 return
