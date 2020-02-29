@@ -459,9 +459,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     func handleEmpty(_ string: String) -> Bool {
         var edited = string
-        edited = string.filter{$0.description == ""}
+        edited = string.filter{$0.description != " "}
         
-        if edited == "" {
+        if edited.count == 0 {
             hapticError()
             showAlert(selectedAlert: ("Error", "Name cannot be blank, Please enter a name"))
         return true
