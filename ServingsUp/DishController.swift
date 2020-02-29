@@ -431,6 +431,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         alert.addTextField()
         let rename = UIAlertAction(title: selectedAlert.2, style: .default){ [unowned alert] _ in
            let answer = alert.textFields![0]
+            let emptyStringTest = self.handleEmpty(answer.text!)
+            guard emptyStringTest == false else {
+                return
+            }
             nameExists = self.checkNameExists(answer.text ?? "nil")
             guard nameExists == false && answer.text != "nil" else {
                 self.hapticError()
@@ -453,6 +457,18 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
        }
     
+    func handleEmpty(_ string: String) -> Bool {
+        var edited = string
+        edited = string.filter{$0.description == ""}
+        
+        if edited == "" {
+            hapticError()
+            showAlert(selectedAlert: ("Error", "Name cannot be blank, Please enter a name"))
+        return true
+        }
+        else {return false}
+    }
+    
     func checkNameExists(_ name: String) -> Bool { // checking if name already exists
         for i in 0..<dishes.count {
             if dishes[i].name == name {
@@ -468,15 +484,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         let rename = UIAlertAction(title: "Rename", style: .default){ (action: UIAlertAction) in
             self.renameAlert(selectedAlert: ("Rename Dish", "Enter new name of this Dish", "Rename"))
-//            alert.addTextField()
-//        let answer = alert.textFields![0]
-//            print("###### \(answer.text ?? "nil")")
-//            guard answer.text!.isEmpty else {
-//                return
-//            }
-//            self.dishes[self.dishes.count-1].name = answer.text!
-//            DatabaseController.saveContext()
-//            self.tab.allDishes = self.dishes
         }
         
         let new = UIAlertAction(title: "New", style: .default, handler: {(action: UIAlertAction)
@@ -549,7 +556,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
 
     @IBAction func saveButtonTapped(_ sender: Any) {
+        
+        if navigationItem.title == "Untitled" {
+            createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
+        }
+        
+        else {
+        
         secondOptAlert(selectedAlert: ("Create Dish", "Rename or Create New", "Rename"))
+        }
       //  createAlert(alertTitle: "Create Dish", alertMessage: "Enter the name of your new dish")
     }
     @IBAction func trashButtonTapped(_ sender: Any) {
@@ -592,12 +607,16 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func createAlert(alertTitle: String, alertMessage: String) {
         let alert = UIAlertController(title: alertTitle , message: alertMessage, preferredStyle: .alert)
         alert.addTextField()
-        var submitTitle = "Save"
+        var submitTitle = "Create"
         if saveButton.title == "New" {
             submitTitle = "Create"
         }
         let submitAction = UIAlertAction(title: submitTitle, style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
+            let emptyStringCheck = self.handleEmpty(answer.text!)
+            guard emptyStringCheck == false else {
+                return
+            }
             self.stringCountCheck(answer.text)
             guard self.checker == true else {
                 return
