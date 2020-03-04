@@ -199,7 +199,6 @@ class BookController: UIViewController {
     func checkNameExists(_ name: String) { // checking if name already exists
         for i in 0..<dishes.count {
             if dishes[i].name == name {
-                print("Name already exists")
                 return
             }
         }
@@ -244,7 +243,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
             
             if StringDictionary[searchDishes[indexPath.row]]?.image != nil {
-                print("image is not present")
                 if let convertedImage = UIImage(data: StringDictionary[searchDishes[indexPath.row]]!.image!,scale: 1.0) {
                    // cell?.imageView?.contentMode = .scaleAspectFit
                     cell?.imageView?.image = convertedImage
@@ -265,7 +263,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             
  
             if StringDictionary[coreDishStrings[indexPath.row]]?.image != nil {
-                print("image is not present")
                 if let convertedImage = UIImage(data: StringDictionary[coreDishStrings[indexPath.row]]!.image!,scale: 1.0) {
                  cell?.imageView?.image = convertedImage
                  }
@@ -316,7 +313,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             
             tableView.reloadData()
             
-            searching = false
             searchBar.text = ""
             tableView.reloadData()
             coreDishStrings = coreDishStrings.filter{$0 != "nil"}
@@ -325,7 +321,10 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             tab.allDishes = dishes
             setUpCoreString()
             
+            searching = false
+            tab.allDishes = dishes
             tableView.reloadData()
+
             return
         }
         

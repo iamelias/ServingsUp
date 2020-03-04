@@ -78,7 +78,7 @@
 		6433A13623DE7989002A14BF /* ServingsUp */ = {
 			isa = PBXGroup;
 			children = (
-				6433A15C23DE7B0F002A14BF /* New Group */,
+				6433A15C23DE7B0F002A14BF /* Model */,
 				6495BF3823E27CEC00A5D1A4 /* DishView.swift */,
 				6495BF3A23E27D0200A5D1A4 /* BookView.swift */,
 				6433A13723DE7989002A14BF /* AppDelegate.swift */,
@@ -101,11 +101,11 @@
 			path = ServingsUp;
 			sourceTree = "<group>";
 		};
-		6433A15C23DE7B0F002A14BF /* New Group */ = {
+		6433A15C23DE7B0F002A14BF /* Model */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			path = "New Group";
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
