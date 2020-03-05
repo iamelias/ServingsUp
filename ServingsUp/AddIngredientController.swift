@@ -10,9 +10,7 @@ import Foundation
 import UIKit
 
 protocol AddIngredientDelegate {
-    
     func getIngredient(food: Ingredient)
-
 }
 
 class AddIngredientController: UIViewController {
@@ -23,12 +21,13 @@ class AddIngredientController: UIViewController {
     @IBOutlet weak var unitPicker: UIPickerView!
     
     var chosenFood: AddIngredientDelegate!
-    var weightUnitArray: [String] = ["mg", "g", "lb"] //tag 1
+    var massUnitArray: [String] = ["mg", "g", "lb"] //tag 1
     var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","ml","gallon"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
-    var selectedUnit: String = "g" //unit selected with pickerview
-    var checker = true
+    var selectedUnit: String = "g" //default mass unit selected with pickerview
+    let tryAgain = "Try Again"
     
+    //MARK: VIEW LIFE CYCLE METHODS
     override func viewDidLoad() {
         super.viewDidLoad()
         unitPicker.delegate = self
@@ -36,80 +35,22 @@ class AddIngredientController: UIViewController {
         textField.delegate = self
         amountTextField.delegate = self
         
+        selectedUnitArray = massUnitArray
         
-        selectedUnitArray = weightUnitArray
-        
-        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //when view is tapped picker/keyboard is dismissed
+        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //adding tap gesture
         
         view.addGestureRecognizer(tapGesture)
-        // unitPicker.resignFirstResponder()
         
-        let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action))
+        let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //adding swipe gesture
         view.addGestureRecognizer(swipeGesture)
         
-        unitPicker.selectRow(1, inComponent: 0, animated: true)
-        if unitPicker.isUserInteractionEnabled {
-            view.endEditing(true)
+        unitPicker.selectRow(1, inComponent: 0, animated: true) // default picker selection
+        if unitPicker.isUserInteractionEnabled { // if picker is being moved
+            view.endEditing(true) //dismiss keyboard
         }
     }
     
-    @objc func action() {
-        view.endEditing(true)
-    }
-    
-    
-    @IBAction func stepperUsed(_ sender: UIStepper) {
-        var number = 0
-        number = Int(sender.value)
-        servingsNumLabel.text = String(number)
-    }
-    
-    @IBAction func addButtonTapped(_ sender: Any) {
-       let firstCheck = stringCountCheck(textField.text)
-        if firstCheck == false {
-        textField.shake()
-        }
-        guard firstCheck == true else { return}
-      
-       let secondCheck = stringCountCheck(amountTextField.text)
-        if secondCheck == false {
-        amountTextField.shake()
-        }
-        guard firstCheck == true && secondCheck == true else {
-            //checker = true
-            return
-        }
-        print("***** \(secondCheck)")
-        if firstCheck == false || secondCheck == false {
-            return
-        }
-        
-        
-        let amountFormatCheck = decimalCheck(amountTextField.text ?? "a")
-        guard amountFormatCheck == true else {
-            return 
-        }
-       createIngredient()
-        dismiss(animated: true)
-    }
-    
-    @IBAction func dismissButtonTapped(_ sender: Any) {
-        dismiss(animated: true) //closing viewController
-    }
-    
-    @IBAction func unitButtonTapped(_ sender: UIButton) {
-        view.endEditing(true)
-        switch sender.tag {
-        case 1: selectedUnitArray = weightUnitArray
-        case 2: selectedUnitArray = volumeUnitArray
-        default: selectedUnitArray = weightUnitArray
-        }
-        if selectedUnitArray == volumeUnitArray {
-            selectedUnit = "tsp"
-        }
-        unitPicker.reloadAllComponents()
-    }
-    
+    //MARK: ADDITIONAL METHODS
     func hapticError() {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.error)
@@ -128,6 +69,33 @@ class AddIngredientController: UIViewController {
         chosenFood.getIngredient(food: ingredient)
     }
     
+    func stringCountCheck(_ value: String?) -> Bool {
+        if value!.count == 0 { //if input string count is 0
+            showAlert(selectedAlert: (tryAgain,"Neither name or amount can be empty"))
+            return false
+        }
+        else if value!.count >= 30 { // if input string count is greater than 20
+            showAlert(selectedAlert:(tryAgain,"Enter a shorter name"))
+            return false
+        }
+        return true
+    }
+    
+    func decimalCheck(_ value: String) -> Bool { //making sure input is a double number
+        let checkNum = Double(value)
+        if checkNum == nil {
+            amountTextField.shake()
+            showAlert(selectedAlert: (tryAgain,"Amount can only be in decimal notation"))
+            return false
+        }
+        return true
+    }
+    
+    @objc func action() { // if tap or swipe dismiss keyboard
+        view.endEditing(true)
+    }
+    
+    //MARK: ALERT METHODS
     func showAlert(selectedAlert: (String, String))  {
         hapticError()
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
@@ -135,49 +103,57 @@ class AddIngredientController: UIViewController {
         
         alert.addAction(ok)
         present(alert, animated: true)
-        
     }
     
-    func stringCountCheck(_ value: String?) -> Bool {
-        print("^^^^ \(value?.count ?? 999999)")
-        
-        if value!.count == 0 {
-            showAlert(selectedAlert: ("Error","Neither name or amount can be empty"))
-            //textField.shake()
-            //hapticError()
-            print("returning false")
-            return false
-           // checker = false
-        }
-        else if value!.count>20 {
-            showAlert(selectedAlert:("Error","Enter a shorter name"))
-            
-            //hapticError()
-            print("returning false")
-            return false
-            //checker = false
-        }
-
-        return true
+    //MARK: IBACTION METHODS
+    @IBAction func stepperUsed(_ sender: UIStepper) { // when stepper is tapped
+        //var number = 0
+        let number = Int(sender.value)
+        servingsNumLabel.text = String(number)
     }
     
-    
-    func decimalCheck(_ value: String) -> Bool {
-        let checkNum = Double(value)
-        if checkNum == nil {
-            amountTextField.shake()
-            showAlert(selectedAlert: ("Error","Amount can only be in decimal notation"))
-            //hapticError()
-            return false
+    @IBAction func addButtonTapped(_ sender: Any) {
+       let firstCheck = stringCountCheck(textField.text) //checking string character count returns true or false
+        if firstCheck == false {
+        textField.shake() // if false shake texfield
+        }
+        guard firstCheck == true else { return} //don't proceed if firstCheck == false
+      
+       let secondCheck = stringCountCheck(amountTextField.text) //verify string character count returns true/false
+        if secondCheck == false {
+        amountTextField.shake()
+        }
+        guard firstCheck == true && secondCheck == true else { //Both firstCheck and secondCheck must be true else return
+            return
         }
         
-        
-        return true
+        let amountFormatCheck = decimalCheck(amountTextField.text ?? "a") //checking if number fits input rules
+        guard amountFormatCheck == true else { // if not return
+            return 
+        }
+       createIngredient() //create ingredient then dismiss
+        dismiss(animated: true)
     }
     
-
+    @IBAction func dismissButtonTapped(_ sender: Any) {
+        dismiss(animated: true) //closing viewController
+    }
+    
+    @IBAction func unitButtonTapped(_ sender: UIButton) {
+        view.endEditing(true) //dismissing keyboard
+        switch sender.tag { //unit array for picker is being selected
+        case 1: selectedUnitArray = massUnitArray
+        case 2: selectedUnitArray = volumeUnitArray
+        default: selectedUnitArray = massUnitArray
+        }
+        if selectedUnitArray == volumeUnitArray { //default volumeUnitArray setting
+            selectedUnit = "tsp"
+        }
+        unitPicker.reloadAllComponents() //reloading pickerview to reflect selected unit button
+    }
 }
 
+//MARK: DELEGATE METHODS
 extension AddIngredientController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     
@@ -198,6 +174,7 @@ extension UITextField {
     }
 }
 
+//MARK: Picker View Methods
 extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -214,7 +191,6 @@ extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource 
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedUnit = selectedUnitArray[row]
-        //view.begin
         view.endEditing(true)
         
     }

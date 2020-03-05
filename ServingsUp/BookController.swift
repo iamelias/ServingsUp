@@ -18,8 +18,8 @@ class BookController: UIViewController {
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
-    var checker = false
     
+    //MARK: VIEW LIFECYCLE METHODS
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -36,9 +36,6 @@ class BookController: UIViewController {
 
         dishes = tab.allDishes
 
-        let dishHolder1 = dishes
-        tab.allDishes = dishHolder1
-        
         let newdishes = dishes.filter{$0.name != nil && $0.name != "Untitled"}
 
         for i in 0..<newdishes.count {
@@ -50,13 +47,10 @@ class BookController: UIViewController {
         
         tableView.reloadData() //to reload tableview after dishes is populated
 
-        let dishHolder = dishes
-        tab.allDishes = dishHolder
+        tab.allDishes = dishes
     }
     
-    func deleteBlank() {
-    }
-    
+    //MARK: CORE DATA FETCH
     func fetchCoreData() { //retrieving dishes from core data. sorted by creation date
         
         let dishRequest: NSFetchRequest<CoreDish> = CoreDish.fetchRequest()
@@ -76,43 +70,8 @@ class BookController: UIViewController {
     func setUpCoreString() {
         coreDishStrings = []
         for i in 0..<dishes.count {
-            //dishes.append(newdishes[i])
             coreDishStrings.append(dishes[i].name ?? "Nil")
             coreDishStrings.sort() //sorting in alphabetic order
-        }
-    }
-    
-    func checkCore() {
-        if coreDishStrings[0] == "Untitled" {
-            coreDishStrings.remove(at: 0)
-            dishes.remove(at: 0)
-            let dishHolder = dishes
-            tab.allDishes = dishHolder
-            tableView.reloadData()
-        }
-        
-    }
-    
-    func checkNilDish() { // will remove all nils in dishes after fetch if any
-        for i in 0..<dishes.count {
-            if dishes[i].name == nil || dishes[i].name == "Untitled" {
-            }
-        }
-    }
-    
-    func stringNameDishes() {
-        
-        guard dishes.count != 0 else {return}
-        for i in 0...dishes.count - 1 { //for every object in dish
-            guard dishes[i].name != nil else { continue} //if dish is not nil
-            dishStrings[i].append(dishes[i].name!) //append dish string name to dishStrings array
-        }
-    }
-    
-    func deleteCoreDishes() {
-        for i in 0..<dishes.count {
-            context.delete(dishes[i])
-            DatabaseController.saveContext()
         }
     }
     
@@ -125,9 +84,8 @@ class BookController: UIViewController {
     }
     
     func clearCoreData() { //Empties all dishes in core data, not currently being used
-        for i in 0..<dishes.count {
-            context.delete(dishes[i])
-        }
+       dishes = []
+        DatabaseController.saveContext()
     }
     
     func deleteCoreData(_ selectedDish: CoreDish) { //deleting selected dish from Core Data
@@ -135,58 +93,35 @@ class BookController: UIViewController {
         DatabaseController.saveContext()
     }
     
+    func checkNilDish() { // will remove all nils in dishes after fetch if any
+        for i in 0..<dishes.count {
+            if dishes[i].name == nil || dishes[i].name == "Untitled" {
+            }
+        }
+    }
+    
+    //MARK: ADDITIONAL METHODS
+    
+    func stringNameDishes() {
+        
+        guard dishes.count != 0 else {return}
+        for i in 0...dishes.count - 1 { //for every object in dish
+            guard dishes[i].name != nil else { continue} //if dish is not nil
+            dishStrings[i].append(dishes[i].name!) //append dish string name to dishStrings array
+        }
+    }
+    
     func stringCountCheck(_ value: String?) {
         if value!.count == 0 {
             showAlert(selectedAlert: ("Error","Dish needs a name"))
-            checker = false
         }
         else if value!.count>10 {
             showAlert(selectedAlert:("Error","Enter a shorter name"))
-            checker = false
         }
         else {
-            checker = true
             return
         }
     }
-    
-    func showAlert(selectedAlert: (String, String))  {
-        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
-        let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
-        
-        alert.addAction(ok)
-        present(alert, animated: true)
-        
-    }
-
-    
-    //MARK: save/submit code
-    func createAlert(_ title: String, _ message: String, _ usesTextField: Bool) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        if usesTextField == true {
-            alert.addTextField()
-        }
-        
-        let submitAction = UIAlertAction(title: "Add", style: .default) { [unowned alert] _ in
-            
-            let answer = alert.textFields![0]
-            guard answer.text != nil else {
-                return
-            }
-            let newDish = self.createDish(answer.text!) //creating a dish object with the user input text
-            self.saveCoreDish(newDish)
-            self.coreDishStrings.append(newDish.name!) //for BookController tableview
-            
-            self.tableView.reloadData()
-        }
-        
-        alert.addAction(submitAction)
-        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
-            alert.view.superview?.isUserInteractionEnabled = true
-            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
-    }
-    
-
     
     func createDish(_ dishName: String) -> CoreDish { // This function creates a dish
         let newDish = CoreDish()
@@ -214,19 +149,54 @@ class BookController: UIViewController {
         self.dismiss(animated: true, completion: nil) //dismissing alert at background tap
     }
     
+    //MARK: ALERT METHODS
+    
+    func showAlert(selectedAlert: (String, String))  {
+        let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "Back", style: .default, handler: nil)
+        
+        alert.addAction(ok)
+        present(alert, animated: true)
+        
+    }
+
+    func createAlert(_ title: String, _ message: String, _ usesTextField: Bool) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        if usesTextField == true {
+            alert.addTextField()
+        }
+        
+        let submitAction = UIAlertAction(title: "Add", style: .default) { [unowned alert] _ in
+            
+            let answer = alert.textFields![0]
+            guard answer.text != nil else {
+                return
+            }
+            let newDish = self.createDish(answer.text!) //creating a dish object with the user input text
+            self.saveCoreDish(newDish)
+            self.coreDishStrings.append(newDish.name!) //for BookController tableview
+            
+            self.tableView.reloadData()
+        }
+        
+        alert.addAction(submitAction)
+        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
+            alert.view.superview?.isUserInteractionEnabled = true
+            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+    }
+    
     @IBAction func newDishButton(_ sender: Any) {
         let title = "Dish"
         let message = "Name your dish"
         createAlert(title, message, true)
     }
 }
-//****************************
-//MARK: TableView
+//MARK: TABLE VIEW
 extension BookController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        tableView.rowHeight = 90
+        tableView.rowHeight = 90 //size of row
         
         if searching {
             return searchDishes.count
@@ -238,42 +208,33 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
-        if searching {
+        if searching { //when typing in search box
         cell?.textLabel?.text = searchDishes[indexPath.row]
         cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
             
             if StringDictionary[searchDishes[indexPath.row]]?.image != nil {
                 if let convertedImage = UIImage(data: StringDictionary[searchDishes[indexPath.row]]!.image!,scale: 1.0) {
-                   // cell?.imageView?.contentMode = .scaleAspectFit
                     cell?.imageView?.image = convertedImage
                  }
                 
             }
             else {
-            print("using default image")
+            //print("using default image")
             }
-            
-            
-        
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
 
             cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
             
-            
- 
             if StringDictionary[coreDishStrings[indexPath.row]]?.image != nil {
                 if let convertedImage = UIImage(data: StringDictionary[coreDishStrings[indexPath.row]]!.image!,scale: 1.0) {
                  cell?.imageView?.image = convertedImage
                  }
-                
             }
             else {
-            print("using default image")
+            //print("using default image")
             }
- 
         }
-        
         return cell!
     }
     
@@ -286,9 +247,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             for i in 0..<dishes.count {
                 if searchDishes[indexPath.row] == dishes[i].name {
                     tab.selectedDish = StringDictionary[searchDishes[indexPath.row]]
-        
                 }
-                
             }
         }
         
@@ -299,7 +258,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         tabBarController?.selectedIndex = 0
     }
 
-    func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) { //deleting row by slide
         
         if searching {
             for i in 0..<dishes.count {
@@ -341,16 +300,15 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
                 }
             }
         }
-        let dishHolder = dishes
+        
         tab.deleting = true
-        tab.allDishes = dishHolder
+        tab.allDishes = dishes
         tableView.reloadData()
         return
     }
 }
 
-//*****************************
-
+//MARK: DELEGATE METHODS
 extension BookController: DishDelegate {
     func getDish(passingDish: Dish) {
         coreDishStrings.append(passingDish.dishName)
@@ -358,8 +316,8 @@ extension BookController: DishDelegate {
         tableView.reloadData() //so you see it when returning from addDishController
     }
 }
-//*****************************
-//MARK: Search Bar
+
+//MARK: SEARCH BAR
 extension BookController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 
@@ -381,8 +339,6 @@ extension BookController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
     }
-    
-
 }
 
 extension BookController: UITextFieldDelegate {
