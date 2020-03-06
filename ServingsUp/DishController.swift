@@ -21,16 +21,20 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBOutlet weak var cameraButton: UIBarButtonItem!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var stepper: UIStepper!
+    @IBOutlet weak var trashButton: UIBarButtonItem!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     let context = DatabaseController.persistentStoreContainer().viewContext
     var dishes: [CoreDish] = [] //stores dishes from core data, stored by creationdate
     var ingredients: [CoreIngredient] = [] //stores ingredients from core data
     var savedDishName: String = "" //dish name
-   // var tempIngred: CoreIngredient?
+    let untitled = "Untitled"
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
-    let untitled = "Untitled"
+    var trashSetting: Bool {
+        return ingredients.count == 0 && navigationItem.title == untitled
+    }
     var originalPhoto: UIImage! //storing original non-meme image
 
     enum SaveButton: String {
@@ -45,6 +49,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tableView.dataSource = self
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         enableCamera(false)
+        activityIndicator.isHidden = true
         defaultView()
         fetchDishes() // getting all dishes in core data
         fetchIngredients() // getting all ingredients of last created entity
@@ -59,7 +64,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         dishes = dishes.filter{$0.name != untitled}
         dishes = dishes.filter{$0.name != nil}
         DatabaseController.saveContext()
-        
         tableView.reloadData()
     }
 
@@ -202,7 +206,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         DatabaseController.saveContext()
     }
     
-    
     //MARK: ADDITIONAL METHODS
     
     func viewSettings(_ cameraSetting: Bool,_ SaveSetting: Bool, SaveButton: SaveButton) { //Nav Setup depending on title
@@ -218,6 +221,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         stepper.value = 1.0
 
         if ingredients.count == 0 {
+            disableTrash()
             saveButton.isEnabled = false
         }
         tableView.reloadData() //for after changing stepper value
@@ -245,6 +249,13 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         switch setting {
         case true: cameraButton.isEnabled = true
         case false: cameraButton.isEnabled = false
+        }
+    }
+    
+    func disableTrash() {
+        switch trashSetting {
+            case true: trashButton.isEnabled = false
+            case false: trashButton.isEnabled = true
         }
     }
     func createDish(_ selectedDish: String) -> CoreDish { //create new dish function
@@ -342,7 +353,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                   return true //name found
               }
           }
-          return false //name doesn't already exits
+          return false //name doesn't already exits 
       }
     
 
@@ -388,7 +399,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
          pickImage.delegate = self
         pickImage.sourceType = .camera
         pickImage.allowsEditing = true
-         present(pickImage, animated:true, completion:nil)
+        present(pickImage, animated:true, completion: {
+            self.activityIndicator.isHidden = true
+            self.activityIndicator.stopAnimating()
+        })
      }
      
      func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -509,7 +523,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             
             let createdDish = self.createDish(answer.text!)
-
+            self.disableTrash()
             if self.saveButton.title == SaveButton.New.rawValue {
                 self.ingredients = []
                 self.navigationItem.title = createdDish.name
@@ -552,6 +566,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tableView.reloadData()
     }
     @IBAction func cameraButtonTapped(_ sender: Any) {
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = false
+            self.activityIndicator.startAnimating()
+        }
         pickImageWith(sourceType: UIImagePickerController.SourceType.camera)
     }
     
@@ -585,7 +603,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBAction func trashButtonTapped(_ sender: Any) {
         guard dishes.count != 0 else{return}
         
-        let first = { self.deleting()}
+        let first = { self.deleting()
+            self.disableTrash()
+        }
         cancelAlert(first: first, selectedAlert: ("Delete Dish", "Are you sure you want to permanently delete this dish?", "Delete"))
     }
 }
@@ -621,6 +641,7 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
         deleteCoreIngredient(selectIngredient: ingredients[indexPath.row])
         ingredients.remove(at: indexPath.row) //removing from array
         tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
+        disableTrash()
     }
 }
 
@@ -640,6 +661,7 @@ extension DishController: AddIngredientDelegate {
         addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
         
         tab.allDishes = dishes
+        disableTrash()
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
 }

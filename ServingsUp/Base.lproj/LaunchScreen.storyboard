@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="@iamEliasLogo2" translatesAutoresizingMaskIntoConstraints="NO" id="flR-9s-ztC">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iamEliasLogo3" translatesAutoresizingMaskIntoConstraints="NO" id="flR-9s-ztC">
                                 <rect key="frame" x="131" y="721" width="112" height="57"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="57" id="I2I-LQ-4Ma"/>
@@ -47,7 +47,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="@iamEliasLogo2" width="95.333335876464844" height="24.333333969116211"/>
         <image name="ServingsUPLogo1" width="197.33332824707031" height="142.66667175292969"/>
+        <image name="iamEliasLogo3" width="82.666664123535156" height="24.333333969116211"/>
     </resources>
 </document>
