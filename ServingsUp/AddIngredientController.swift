@@ -22,9 +22,9 @@ class AddIngredientController: UIViewController {
     
     var chosenFood: AddIngredientDelegate!
     var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
-    var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
+    var volumeUnitArray: [String] = ["","oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
-    var selectedUnit: String = "g" //default mass unit selected with pickerview
+    var selectedUnit: String = "" //default mass unit selected with pickerview
     let tryAgain = "Try Again"
     
     //MARK: VIEW LIFE CYCLE METHODS
@@ -44,7 +44,7 @@ class AddIngredientController: UIViewController {
         let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //adding swipe gesture
         view.addGestureRecognizer(swipeGesture)
         
-        unitPicker.selectRow(1, inComponent: 0, animated: true) // default picker selection
+        unitPicker.selectRow(0, inComponent: 0, animated: true) // default picker selection
         if unitPicker.isUserInteractionEnabled { // if picker is being moved
             view.endEditing(true) //dismiss keyboard
         }
@@ -63,7 +63,7 @@ class AddIngredientController: UIViewController {
         let testServings = Int(servingsNumLabel!.text!)
         ingredient.servings = Int(testServings ?? 1)   //storing initial servingsNum as an int
         var testAmount = amountTextField.text!
-
+        
         testAmount = testAmount.trimmingCharacters(in: .whitespaces) //removing empty spaces from decimal amount   
         let testAmountDouble = Double(testAmount)
         ingredient.amount = Double(testAmountDouble ?? 0.0) //storing initial amount of unit as double
@@ -118,15 +118,15 @@ class AddIngredientController: UIViewController {
     }
     
     @IBAction func addButtonTapped(_ sender: Any) {
-       let firstCheck = stringCountCheck(textField.text) //checking string character count returns true or false
+        let firstCheck = stringCountCheck(textField.text) //checking string character count returns true or false
         if firstCheck == false {
-        textField.shake() // if false shake texfield
+            textField.shake() // if false shake texfield
         }
         guard firstCheck == true else { return} //don't proceed if firstCheck == false
-      
-       let secondCheck = stringCountCheck(amountTextField.text) //verify string character count returns true/false
+        
+        let secondCheck = stringCountCheck(amountTextField.text) //verify string character count returns true/false
         if secondCheck == false {
-        amountTextField.shake()
+            amountTextField.shake()
         }
         guard firstCheck == true && secondCheck == true else { //Both firstCheck and secondCheck must be true else return
             return
@@ -136,7 +136,7 @@ class AddIngredientController: UIViewController {
         guard amountFormatCheck == true else { // if not return
             return 
         }
-       createIngredient() //create ingredient then dismiss
+        createIngredient() //create ingredient then dismiss
         dismiss(animated: true)
     }
     
@@ -151,9 +151,7 @@ class AddIngredientController: UIViewController {
         case 2: selectedUnitArray = volumeUnitArray
         default: selectedUnitArray = massUnitArray
         }
-        if selectedUnitArray == volumeUnitArray { //default volumeUnitArray setting
-            selectedUnit = "tsp"
-        }
+        
         unitPicker.reloadAllComponents() //reloading pickerview to reflect selected unit button
     }
 }
@@ -161,10 +159,10 @@ class AddIngredientController: UIViewController {
 //MARK: DELEGATE METHODS
 extension AddIngredientController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    
+        
         textField.resignFirstResponder()
         return true
-}
+    }
 }
 
 extension UITextField {
