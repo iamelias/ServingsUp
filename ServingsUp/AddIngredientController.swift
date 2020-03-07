@@ -21,8 +21,8 @@ class AddIngredientController: UIViewController {
     @IBOutlet weak var unitPicker: UIPickerView!
     
     var chosenFood: AddIngredientDelegate!
-    var massUnitArray: [String] = ["mg", "g", "lb"] //tag 1
-    var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","ml","gallon"] //tag 2
+    var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
+    var volumeUnitArray: [String] = ["oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
     var selectedUnit: String = "g" //default mass unit selected with pickerview
     let tryAgain = "Try Again"
@@ -62,8 +62,11 @@ class AddIngredientController: UIViewController {
         //stringCountCheck(ingredient.name)
         let testServings = Int(servingsNumLabel!.text!)
         ingredient.servings = Int(testServings ?? 1)   //storing initial servingsNum as an int
-        let testAmount = Double(amountTextField!.text!)
-        ingredient.amount = Double(testAmount ?? 0.0) //storing initial amount of unit as double
+        var testAmount = amountTextField.text!
+
+        testAmount = testAmount.trimmingCharacters(in: .whitespaces) //removing empty spaces from decimal amount   
+        let testAmountDouble = Double(testAmount)
+        ingredient.amount = Double(testAmountDouble ?? 0.0) //storing initial amount of unit as double
         ingredient.unit = selectedUnit
         
         chosenFood.getIngredient(food: ingredient)
@@ -82,7 +85,9 @@ class AddIngredientController: UIViewController {
     }
     
     func decimalCheck(_ value: String) -> Bool { //making sure input is a double number
-        let checkNum = Double(value)
+        
+        let filteredValue = value.trimmingCharacters(in: .whitespaces) //removing empty spaces from decimal amount
+        let checkNum = Double(filteredValue)
         if checkNum == nil {
             amountTextField.shake()
             showAlert(selectedAlert: (tryAgain,"Amount can only be in decimal notation"))
