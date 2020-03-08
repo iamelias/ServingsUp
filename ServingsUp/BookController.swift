@@ -33,11 +33,11 @@ class BookController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         dishes = []
         coreDishStrings = []
-
+        
         dishes = tab.allDishes
-
+        
         let newdishes = dishes.filter{$0.name != nil && $0.name != "Untitled"}
-
+        
         for i in 0..<newdishes.count {
             coreDishStrings.append(newdishes[i].name ?? "Nil")
             StringDictionary[coreDishStrings[i]] = newdishes[i]
@@ -46,7 +46,7 @@ class BookController: UIViewController {
         coreDishStrings.sort()//sorting view in alphabetic order
         
         tableView.reloadData() //to reload tableview after dishes is populated
-
+        
         tab.allDishes = dishes
     }
     
@@ -84,7 +84,7 @@ class BookController: UIViewController {
     }
     
     func clearCoreData() { //Empties all dishes in core data, not currently being used
-       dishes = []
+        dishes = []
         DatabaseController.saveContext()
     }
     
@@ -159,7 +159,7 @@ class BookController: UIViewController {
         present(alert, animated: true)
         
     }
-
+    
     func createAlert(_ title: String, _ message: String, _ usesTextField: Bool) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         if usesTextField == true {
@@ -209,30 +209,30 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell")
         if searching { //when typing in search box
-        cell?.textLabel?.text = searchDishes[indexPath.row]
-        cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
+            cell?.textLabel?.text = searchDishes[indexPath.row]
+            cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
             
             if StringDictionary[searchDishes[indexPath.row]]?.image != nil {
                 if let convertedImage = UIImage(data: StringDictionary[searchDishes[indexPath.row]]!.image!,scale: 1.0) {
                     cell?.imageView?.image = convertedImage
-                 }
+                }
                 
             }
             else {
-            //print("using default image")
+                //print("using default image")
             }
         } else {
             cell?.textLabel?.text = coreDishStrings[indexPath.row]
-
+            
             cell?.imageView?.image = #imageLiteral(resourceName: "fullCamera1")
             
             if StringDictionary[coreDishStrings[indexPath.row]]?.image != nil {
                 if let convertedImage = UIImage(data: StringDictionary[coreDishStrings[indexPath.row]]!.image!,scale: 1.0) {
-                 cell?.imageView?.image = convertedImage
-                 }
+                    cell?.imageView?.image = convertedImage
+                }
             }
             else {
-            //print("using default image")
+                //print("using default image")
             }
         }
         return cell!
@@ -257,7 +257,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         tab.returning = true
         tabBarController?.selectedIndex = 0
     }
-
+    
     func tableView(_ tableView: UITableView, commit editingStyle:UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) { //deleting row by slide
         
         if searching {
@@ -275,19 +275,19 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             searchBar.text = ""
             tableView.reloadData()
             coreDishStrings = coreDishStrings.filter{$0 != "nil"}
-                let newDish = dishes
-               dishes = newDish.filter{$0.name != nil}
+            let newDish = dishes
+            dishes = newDish.filter{$0.name != nil}
             tab.allDishes = dishes
             setUpCoreString()
             
             searching = false
             tab.allDishes = dishes
             tableView.reloadData()
-
+            
             return
         }
         
-
+        
         if !searching {
             
             for i in 0..<dishes.count {
@@ -320,7 +320,7 @@ extension BookController: DishDelegate {
 //MARK: SEARCH BAR
 extension BookController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-
+        
         searchDishes = coreDishStrings.filter({$0.lowercased().prefix(searchText.count) == searchText.lowercased()})
         
         searching = true
@@ -335,7 +335,7 @@ extension BookController: UISearchBarDelegate {
         
         tableView.reloadData() //so table changes with cancel
     }
-
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
     }
@@ -343,8 +343,8 @@ extension BookController: UISearchBarDelegate {
 
 extension BookController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    
+        
         textField.resignFirstResponder()
         return true
-}
+    }
 }

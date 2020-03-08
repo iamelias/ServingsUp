@@ -24,7 +24,7 @@ class AddIngredientController: UIViewController {
     var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
     var volumeUnitArray: [String] = ["","oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
-    var selectedUnit: String = "" //default mass unit selected with pickerview
+    var selectedUnit: String = "oz" //default mass unit selected with pickerview
     let tryAgain = "Try Again"
     
     //MARK: VIEW LIFE CYCLE METHODS
@@ -44,7 +44,7 @@ class AddIngredientController: UIViewController {
         let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //adding swipe gesture
         view.addGestureRecognizer(swipeGesture)
         
-        unitPicker.selectRow(0, inComponent: 0, animated: true) // default picker selection
+        unitPicker.selectRow(1, inComponent: 0, animated: true) // default picker selection
         if unitPicker.isUserInteractionEnabled { // if picker is being moved
             view.endEditing(true) //dismiss keyboard
         }
@@ -74,11 +74,11 @@ class AddIngredientController: UIViewController {
     
     func stringCountCheck(_ value: String?) -> Bool {
         if value!.count == 0 { //if input string count is 0
-            showAlert(selectedAlert: (tryAgain,"Neither name or amount can be empty"))
+            showAlert(selectedAlert: (tryAgain,"Neither name nor amount can be empty"))
             return false
         }
-        else if value!.count >= 30 { // if input string count is greater than 20
-            showAlert(selectedAlert:(tryAgain,"Enter a shorter name"))
+        else if value!.count >= 15 { // if input string count is greater than 20
+            showAlert(selectedAlert:(tryAgain,"Name is too long"))
             return false
         }
         return true
@@ -90,7 +90,12 @@ class AddIngredientController: UIViewController {
         let checkNum = Double(filteredValue)
         if checkNum == nil {
             amountTextField.shake()
-            showAlert(selectedAlert: (tryAgain,"Amount can only be in decimal notation"))
+            showAlert(selectedAlert: (tryAgain,"Invalid characters"))
+            return false
+        }
+        if checkNum! >= 10000 {
+            amountTextField.shake()
+            showAlert(selectedAlert: (tryAgain,"Decimal input is too large"))
             return false
         }
         return true
@@ -131,7 +136,7 @@ class AddIngredientController: UIViewController {
         guard firstCheck == true && secondCheck == true else { //Both firstCheck and secondCheck must be true else return
             return
         }
-        
+         
         let amountFormatCheck = decimalCheck(amountTextField.text ?? "a") //checking if number fits input rules
         guard amountFormatCheck == true else { // if not return
             return 
@@ -150,6 +155,10 @@ class AddIngredientController: UIViewController {
         case 1: selectedUnitArray = massUnitArray
         case 2: selectedUnitArray = volumeUnitArray
         default: selectedUnitArray = massUnitArray
+        }
+        
+        if selectedUnitArray == volumeUnitArray {
+            selectedUnit = "oz"
         }
         
         unitPicker.reloadAllComponents() //reloading pickerview to reflect selected unit button
