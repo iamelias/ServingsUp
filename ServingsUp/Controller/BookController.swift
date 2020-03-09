@@ -2,11 +2,14 @@ import Foundation
 import UIKit
 import CoreData
 
+protocol DishDelegate {
+    func getDish(passingDish: Dish)
+}
+
 class BookController: UIViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
-    
     
     var coreDishStrings: [String] = [] //will search through this, when looking for string
     var searchDishes = [String]() //stores filtered returns as user inputs into searchbar
