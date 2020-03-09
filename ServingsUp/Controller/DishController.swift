@@ -383,8 +383,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         return false //name doesn't already exits
     }
     
-    
-    
     @objc func alertBackgroundTapped() //background tap dismiss
     {
         self.dismiss(animated: true, completion: nil)
@@ -418,12 +416,21 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         coreIn.singleAmount = food!.amount/Double(food!.servings) //amount per 1 serving
         let changedQuantLabel = Double(quantLabel!.text ?? "1") //converting self stepper to Double for calc
         coreIn.editedAmount = coreIn.singleAmount * Double(changedQuantLabel ?? 1.0) //amount dependant on stepper
+
+        if food!.unit == "cup" && coreIn.editedAmount != 1.0 {
+            food!.unit = "cups"
+        }
+        
+        if food!.unit == "cups" && coreIn.editedAmount == 1.0 {
+            food!.unit = "cup"
+        }
+        
         var intAmount: Int = 1
         if coreIn.editedAmount.remainder(dividingBy: 1) == 0 { //if number after dec point is not 0
             intAmount = Int(coreIn.editedAmount) //turn double into int
             coreIn.modifiedIngredient = "\(intAmount)" + " \(food!.unit)" //use int in modifiedIngredient
         }
-        else {//8888888888
+        else {
             let doubleAmount = Double(String(format: "%.3f", coreIn.editedAmount))
         coreIn.modifiedIngredient = "\(doubleAmount!)" + " \(food!.unit)" //use original double
         }
