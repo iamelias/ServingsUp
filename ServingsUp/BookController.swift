@@ -37,6 +37,7 @@ class BookController: UIViewController {
         dishes = tab.allDishes
         
         let newdishes = dishes.filter{$0.name != nil && $0.name != "Untitled"}
+        dishes = newdishes
         
         for i in 0..<newdishes.count {
             coreDishStrings.append(newdishes[i].name ?? "Nil")
@@ -48,6 +49,11 @@ class BookController: UIViewController {
         tableView.reloadData() //to reload tableview after dishes is populated
         
         tab.allDishes = dishes
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        searchBar.text = ""
+        searchBar.endEditing(true)
+        searching = false
     }
     
     //MARK: CORE DATA FETCH
@@ -64,7 +70,6 @@ class BookController: UIViewController {
             print("unable to fetch dishes in BookController")
             return
         }
-        checkNilDish()
     }
     
     func setUpCoreString() {
@@ -91,13 +96,6 @@ class BookController: UIViewController {
     func deleteCoreData(_ selectedDish: CoreDish) { //deleting selected dish from Core Data
         context.delete(selectedDish)
         DatabaseController.saveContext()
-    }
-    
-    func checkNilDish() { // will remove all nils in dishes after fetch if any
-        for i in 0..<dishes.count {
-            if dishes[i].name == nil || dishes[i].name == "Untitled" {
-            }
-        }
     }
     
     //MARK: ADDITIONAL METHODS
@@ -199,6 +197,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
         tableView.rowHeight = 90 //size of row
         
         if searching {
+            
             return searchDishes.count
         }
         else {

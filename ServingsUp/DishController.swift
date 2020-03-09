@@ -34,6 +34,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     var trashSetting: Bool {
         return ingredients.count == 0 && navigationItem.title == untitled
     }
+    var resetServingsCheck: Bool { //checks if ingredients count is 0
+        return ingredients.count == 0
+    }
     var originalPhoto: UIImage! //storing original non-meme image
     
     enum SaveButton: String {
@@ -92,6 +95,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         else { //If nav title is "Untitled"
             viewSettings(false,true,SaveButton: SaveButton.Save)
         }
+        
+        resetServ()
         disableTrash()
 
     }
@@ -235,6 +240,12 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tableView.reloadData() //for after changing stepper value
     }
     
+    func resetServ() {
+        if resetServingsCheck == true {
+            resetServings()
+        }
+    }
+    
     func updateView(_ selectedDish: CoreDish) { //change in view after fetch to show last in fetched array
         guard dishes.count != 0 else { return } // if dishes count is 0 return
         
@@ -356,6 +367,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             return true
         }
         else {return false}
+    }
+    
+    func resetServings() {
+        stepper.value = 1.0
+        quantLabel.text = "1"
     }
     
     func checkNameExists(_ name: String) -> Bool { // checking if name already exists in dishes
@@ -507,6 +523,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let delete = UIAlertAction(title: selectedAlert.2, style: .destructive, handler: {(action: UIAlertAction)
             in
             first()
+            self.resetServ()
         })
         alert.addAction(cancel)
         alert.addAction(delete)
@@ -676,6 +693,7 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
         deleteCoreIngredient(selectIngredient: ingredients[indexPath.row])
         ingredients.remove(at: indexPath.row) //removing from array
         tableView.deleteRows(at: [indexPath], with: .fade) //removing from table
+        resetServ()
         disableTrash()
     }
 }
@@ -695,6 +713,7 @@ extension DishController: AddIngredientDelegate {
         let modifiedFood = modify(food, false, nil)
         addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
         tab.allDishes = dishes
+        resetServ()
         disableTrash()
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
