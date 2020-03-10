@@ -11,7 +11,6 @@ import UIKit
 import Foundation
 import CoreData
 
-
 class DishController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet weak var tableView: UITableView!
@@ -75,14 +74,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     override func viewDidAppear(_ animated: Bool) {
         
         if dishes.last?.name != navigationItem.title { //if last dishes name doesn't equal navTitle
-            dishes = tab.allDishes
+            tabUpdate(2) // tabUpdate 2 is: dishes = tab.allDishes
             navigationItem.title = dishes.last?.name
             fetchIngredients()
-            tab.allDishes = dishes
+            tabUpdate(1) // tapUpdate 1 is: tab.allDishes = dishes
             tableView.reloadData()
         }
         if tab.returning == true {
-            dishes = tab.allDishes
+            tabUpdate(2)
             rearrangeDishes()
             fetchIngredients()
             tab.returning = false
@@ -105,11 +104,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     override func viewWillDisappear(_ animated: Bool) {
         dishes = dishes.compactMap{$0} //removing nils if any in dishes before moving to bookController
-        tab.allDishes = dishes //updating shared dishes
+        tabUpdate(1) //updating shared dishes
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        tab.allDishes = dishes
+        tabUpdate(1)
     }
     
     //MARK: CORE DATA FETCHES
@@ -146,7 +145,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         if let checkDish = dishes.last { //unwrapping last dish
             updateView(checkDish) // changing view to reflect last dish
         }
-        tab.allDishes = dishes //updating shared all dishes with what was pulled
+        tabUpdate(1) //updating shared all dishes with what was pulled
         tableView.reloadData() //table reloads after every fetch
     }
     
@@ -309,7 +308,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         deleteDish(dishes[dishes.count-1]) //will delete the viewing dish
         navigationItem.title = untitled
         clearCoreIngredients() // will delete all ingredients that are in ingredients array
-        //createTempDish()
         createTempDish(untitled)
         
         if navigationItem.title == untitled {
@@ -322,11 +320,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let convertedPhoto = originalPhoto.pngData()
         dishes[dishes.count-1].image = convertedPhoto
         DatabaseController.saveContext()
-        tab.allDishes = dishes
+        tabUpdate(1)
     }
     
     func rearrangeDishes() { //moving dish to end of array by delete and append
-        dishes = tab.allDishes
+        tabUpdate(2)
         tab.selectedDish.creationDate = Date() //updating creation date
         
         for i in 0..<dishes.count{ //Don't include last element in iteration
@@ -336,7 +334,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
         }
         dishes.append(tab.selectedDish) //adding selected dish to end of array
-        tab.allDishes = dishes
+        tabUpdate(1)
         
         updateView(dishes.last!) //updating the nav view
     }
@@ -372,6 +370,16 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             return true
         }
         else {return false}
+    }
+    
+    func tabUpdate(_ value: Int) {
+        
+        switch value {
+        case 1: tab.allDishes = dishes
+        case 2: dishes = tab.allDishes
+        default:
+            print("Error")
+        }
     }
     
     func resetServings() {
@@ -411,7 +419,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
          else if selfStepper == false {// if not using stepper but(adding ingredient)
             coreIn = CoreIngredient(context: context)
-             //coreIn = ingredients[i!]
         }
         if i != nil {
             coreIn = ingredients[i!]
@@ -436,7 +443,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             coreIn.modifiedIngredient = "\(intAmount)" + " \(food!.unit)" //use int in modifiedIngredient
         }
         else {
-            let doubleAmount = Double(String(format: "%.3f", coreIn.editedAmount))
+            let doubleAmount = Double(String(format: "%.3f", coreIn.editedAmount)) //3 numbers after decimal point
         coreIn.modifiedIngredient = "\(doubleAmount!)" + " \(food!.unit)" //use original double
         }
         coreIn.editedServings = "\(food!.servings)"
@@ -490,7 +497,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.renameAlert(selectedAlert: selectedAlert)
         }
         var nameExists = false
-       // let newSelect = selectedAlert
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         alert.addTextField()
         let rename = UIAlertAction(title: selectedAlert.2, style: .default){ (action: UIAlertAction) in
@@ -500,12 +506,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 return
             }
             nameExists = self.checkNameExists(answer.text ?? "nil")
-            guard nameExists == false && answer.text != "nil" else {
+            guard nameExists == false && (answer.text != "nil" && answer.text != self.untitled) else {
                 self.hapticError()
-                //add return alert(selected alert)
+                var existsMessage = self.existsError
+                
+                if answer.text! == self.untitled {
+                    existsMessage = "Please use a different name"
+                }
 
-                self.basicAlert(selectedAlert: (self.tryAgain, self.existsError), returnAlert: selectedAlert, passClosure: first)
-//                self.renameAlert(selectedAlert: (selectedAlert.0,selectedAlert.1,selectedAlert.2))
+                self.basicAlert(selectedAlert: (self.tryAgain, existsMessage), returnAlert: selectedAlert, passClosure: first)
                 return
             }
             self.dishes[self.dishes.count-1].name = answer.text!
@@ -578,9 +587,13 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
             
             nameExists = self.checkNameExists(answer.text ?? "nil")
-            guard nameExists == false && answer.text != "nil" else {
+            guard nameExists == false && (answer.text != "nil" && answer.text != self.untitled) else {
                 self.hapticError()
-                self.basicAlert(selectedAlert: (self.tryAgain, "There is already a dish named \(answer.text!). Please enter a new name"),returnAlert: selectedDishTuple,passClosure:methodClosure) //passing in first closure
+                var existsMessage = "There is already a dish named \(answer.text!). Please enter a new name"
+                if answer.text! == self.untitled {
+                    existsMessage = "Please use a different name"
+                }
+                self.basicAlert(selectedAlert: (self.tryAgain, existsMessage),returnAlert: selectedDishTuple,passClosure:methodClosure) //passing in first closure
                 return
             }
             
@@ -633,7 +646,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         for i in 0..<ingredients.count { //updating ingredients amounts to reflect step changes
             let converted = convertIngredient(food: ingredients[i])
-            // ingredients[i] = modifyExisting(converted, true, i)
 
             ingredients[i] = modify(converted, true, i)
 
@@ -740,7 +752,7 @@ extension DishController: AddIngredientDelegate {
         
         let modifiedFood = modify(food, false, nil)
         addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
-        tab.allDishes = dishes
+        tabUpdate(1)
         resetServ()
         disableTrash()
         tableView.reloadData() //reloading table to show new CoreIngredient

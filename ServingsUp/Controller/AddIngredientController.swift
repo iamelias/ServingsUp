@@ -50,6 +50,9 @@ class AddIngredientController: UIViewController {
         if unitPicker.isUserInteractionEnabled { // if picker is being moved
             view.endEditing(true) //dismiss keyboard
         }
+        if UIDevice.current.orientation.isLandscape {
+            emptyDishImage.isHidden = true
+        }
     }
     
     //MARK: ADDITIONAL METHODS
