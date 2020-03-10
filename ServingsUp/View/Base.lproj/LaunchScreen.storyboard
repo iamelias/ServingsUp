@@ -36,6 +36,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="flR-9s-ztC" secondAttribute="trailing" constant="132" id="E3F-Vc-H34"/>
                             <constraint firstItem="ktM-6z-mvb" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="l4n-rL-O4Q"/>
                             <constraint firstItem="flR-9s-ztC" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="n7g-qg-X7B"/>
+                            <constraint firstItem="flR-9s-ztC" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="rm6-4M-06T"/>
                             <constraint firstItem="ktM-6z-mvb" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="vUF-ps-hZ3"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>

@@ -19,6 +19,7 @@ class AddIngredientController: UIViewController {
     @IBOutlet weak var servingsNumLabel: UILabel!
     @IBOutlet weak var amountTextField: UITextField!
     @IBOutlet weak var unitPicker: UIPickerView!
+    @IBOutlet weak var emptyDishImage: UIImageView!
     
     var chosenFood: AddIngredientDelegate!
     var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
@@ -105,6 +106,16 @@ class AddIngredientController: UIViewController {
     @objc func action() { // if tap or swipe dismiss keyboard
         view.endEditing(true)
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.current.orientation.isLandscape {
+            emptyDishImage.isHidden = true
+        }
+        else {
+            emptyDishImage.isHidden = false
+        }
+    }
+    
     
     //MARK: ALERT METHODS
     func showAlert(selectedAlert: (String, String))  {
