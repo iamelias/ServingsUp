@@ -18,6 +18,7 @@ class BookController: UIViewController {
     var dishStrings: [String] = []
     var fetchResult: [CoreDish] = [] //retrieved dishes from core data
     var searching = false
+    var tryAgain = "Try Again"
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
@@ -114,10 +115,10 @@ class BookController: UIViewController {
     
     func stringCountCheck(_ value: String?) {
         if value!.count == 0 {
-            showAlert(selectedAlert: ("Error","Dish needs a name"))
+            showAlert(selectedAlert: (tryAgain,"Dish needs a name"))
         }
         else if value!.count>10 {
-            showAlert(selectedAlert:("Error","Enter a shorter name"))
+            showAlert(selectedAlert:(tryAgain,"Enter a shorter name"))
         }
         else {
             return
