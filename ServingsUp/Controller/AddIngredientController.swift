@@ -200,7 +200,7 @@ extension UITextField {
     }
 }
 
-//MARK: Picker View Methods
+//MARK: PICKERVIEW METHODS
 extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
