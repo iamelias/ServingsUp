@@ -235,7 +235,7 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
                 }
             }
             else {
-                //print("using default image")
+//                print("using default image")
             }
         }
         return cell!
@@ -289,7 +289,6 @@ extension BookController: UITableViewDataSource, UITableViewDelegate {
             
             return
         }
-        
         
         if !searching {
             

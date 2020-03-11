@@ -99,7 +99,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         resetServ()
         disableTrash()
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -488,7 +487,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
         alert.addAction(ok)
         present(alert, animated: true)
-        
     }
     
     func renameAlert(selectedAlert: (String, String, String)) {

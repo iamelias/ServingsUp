@@ -25,7 +25,7 @@ class AddIngredientController: UIViewController {
     var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
     var volumeUnitArray: [String] = ["","oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
-    var selectedUnit: String = "oz" //default mass unit selected with pickerview
+    var selectedUnit: String = "" //default mass unit selected with pickerview
     let tryAgain = "Try Again"
     let blankError = "Please enter a name"
     
@@ -46,7 +46,7 @@ class AddIngredientController: UIViewController {
         let swipeGesture: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(AddIngredientController.action)) //adding swipe gesture
         view.addGestureRecognizer(swipeGesture)
         
-        unitPicker.selectRow(1, inComponent: 0, animated: true) // default picker selection
+        unitPicker.selectRow(0, inComponent: 0, animated: true) // default picker selection
         if unitPicker.isUserInteractionEnabled { // if picker is being moved
             view.endEditing(true) //dismiss keyboard
         }
@@ -82,7 +82,7 @@ class AddIngredientController: UIViewController {
             showAlert(selectedAlert: (tryAgain,"Neither name nor amount can be empty"))
             return false
         }
-        else if value!.count >= 15 { // if input string count is greater than 20
+        else if value!.count >= 20 { // if input string count is greater than 20
             showAlert(selectedAlert:(tryAgain,"Please enter a shorter name for the Ingredient"))
             return false
         }
@@ -112,7 +112,7 @@ class AddIngredientController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.current.orientation.isLandscape {
-            emptyDishImage.isHidden = true
+            emptyDishImage.isHidden = true //Hide empty dish image if changing orientation to landscape
         }
         else {
             emptyDishImage.isHidden = false
@@ -132,7 +132,6 @@ class AddIngredientController: UIViewController {
     
     //MARK: IBACTION METHODS
     @IBAction func stepperUsed(_ sender: UIStepper) { // when stepper is tapped
-        //var number = 0
         let number = Int(sender.value)
         servingsNumLabel.text = String(number)
     }
@@ -173,7 +172,7 @@ class AddIngredientController: UIViewController {
         }
         
         if selectedUnitArray == volumeUnitArray {
-            selectedUnit = "oz"
+            selectedUnit = ""
         }
         
         unitPicker.reloadAllComponents() //reloading pickerview to reflect selected unit button
@@ -219,7 +218,6 @@ extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedUnit = selectedUnitArray[row]
         view.endEditing(true)
-        
     }
 }
 
