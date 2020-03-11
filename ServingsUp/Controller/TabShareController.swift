@@ -10,12 +10,6 @@ import Foundation
 import UIKit
 import CoreData
 
-
-
-
-import Foundation
-import UIKit
-
 class TabShareController: UITabBarController {
     
     var allDishes: [CoreDish] = []
