@@ -60,7 +60,7 @@ class AddIngredientController: UIViewController {
         if UIDevice.current.orientation.isLandscape {
             emptyDishImage.isHidden = true
         }
-        preSet(updateIngredient)
+        preSet(updateIngredient) //if updating instead of adding new, will fill in view with already existing values
         
         createToolbar() //creating toolbar for the num pad's keyboard
         
@@ -69,13 +69,13 @@ class AddIngredientController: UIViewController {
     //MARK: ADDITIONAL METHODS
     func createToolbar() {
         let numPadToolbar: UIToolbar = UIToolbar()
-
+        
         numPadToolbar.barStyle = UIBarStyle.default
         numPadToolbar.items=[
             UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: self, action: nil),
             UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.resignKeyboard))
         ]
-
+        
         numPadToolbar.sizeToFit()
         
         amountTextField.inputAccessoryView = numPadToolbar
@@ -84,7 +84,7 @@ class AddIngredientController: UIViewController {
     @objc func resignKeyboard () {
         amountTextField.resignFirstResponder()
     }
-
+    
     func preSet(_ ingredient: CoreIngredient?) {
         guard ingredient != nil else {
             return
@@ -143,7 +143,7 @@ class AddIngredientController: UIViewController {
         }
         return true
     }
-
+    
     func decimalCheck(_ value: String) -> Bool { //making sure input is a double number
         
         let filteredValue = value.trimmingCharacters(in: .whitespaces) //removing empty spaces from decimal amount
@@ -204,7 +204,7 @@ class AddIngredientController: UIViewController {
         guard firstCheck == true && secondCheck == true else { //Both firstCheck and secondCheck must be true else return
             return
         }
-         
+        
         let amountFormatCheck = decimalCheck(amountTextField.text ?? "a") //checking if number fits input rules
         guard amountFormatCheck == true else { // if not return
             return 

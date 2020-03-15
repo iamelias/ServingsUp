@@ -39,7 +39,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         DatabaseController.saveContext()
     }
-
-
 }
 

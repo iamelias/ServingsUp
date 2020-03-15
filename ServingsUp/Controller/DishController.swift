@@ -120,7 +120,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             dishes = try context.fetch(fetchRequest) //getting all saved dishes and setting equal to dishes
             
             if dishes.last?.name == nil {
-                createTempDish(untitled)
+                createTempDish()
                 DatabaseController.saveContext()
             }
             
@@ -167,11 +167,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             print("unable to fetch")
             return
         }
-
+        
         checkNilIngredient() // checking/removing any nil ingredients
         
         DatabaseController.saveContext()
-  
+        
         tableView.reloadData() //reload table to show ingredients
     }
     
@@ -208,7 +208,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         DatabaseController.saveContext()
     }
     
-    func updateCoreIngredients(_ selectedDish: CoreDish) {  //matching ingredient with dish
+    func matchCoreIngredients(_ selectedDish: CoreDish) {  //matching ingredient with dish
         for i in 0..<ingredients.count {
             ingredients[i].dish = selectedDish
         }
@@ -257,7 +257,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     func checkNilIngredient() { //clears ingredients of nil or "Untitled"
-
+        
         for i in 0..<ingredients.count {
             if ingredients[i].name == nil && dishes[i].name == untitled{
                 ingredients.remove(at: i)
@@ -289,13 +289,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         return newDish
     }
     
-    func createTempDish(_ dish: String) {
-        let newDish = CoreDish(context: context)
-        newDish.name = untitled
+    func createTempDish() {
+        let newDish = createDish(untitled)
         newDish.stepperValue = stepper.value
-        newDish.editedServings = quantLabel.text
         saveButton.isEnabled = true
-        newDish.creationDate = Date()
         dishes.append(newDish)
     }
     
@@ -308,7 +305,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         deleteDish(dishes[dishes.count-1]) //will delete the viewing dish
         navigationItem.title = untitled
         clearCoreIngredients() // will delete all ingredients that are in ingredients array
-        createTempDish(untitled)
+        createTempDish()
         
         if navigationItem.title == untitled {
             enableCamera(false)
@@ -416,14 +413,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func modify(_ food: Ingredient? = nil, _ selfStepper: Bool, _ i: Int?, _ type: String?) -> CoreIngredient{ //updating core data saves (coreIn)
         var coreIn: CoreIngredient!
         if selfStepper == true { // if using stepper
-          coreIn = ingredients[i!]
+            coreIn = ingredients[i!]
         }
-         else if selfStepper == false {// if not using stepper but(adding ingredient)
+        else if selfStepper == false {// if not using stepper but(adding ingredient)
             if type == "Update" {
                 coreIn = ingredients[i!]
             }
             else {
-            coreIn = CoreIngredient(context: context)
+                coreIn = CoreIngredient(context: context)
             }
         }
         if i != nil {
@@ -432,15 +429,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         //coreIn.creationDate = food!.creationDate
         
         if type == "Add" {
-        coreIn.creationDate = Date()
+            coreIn.creationDate = Date()
         }
         coreIn.name = food!.name
         coreIn.singleAmount = food!.amount/Double(food!.servings) //amount per 1 serving
         let changedQuantLabel = Double(quantLabel!.text ?? "1") //converting self stepper to Double for calc
         coreIn.editedAmount = coreIn.singleAmount * Double(changedQuantLabel ?? 1.0) //amount dependant on stepper
-  
+        
         checkPlural(food, coreIn)
-
+        
         var intAmount: Int = 1
         if coreIn.editedAmount.remainder(dividingBy: 1) == 0 { //if number after dec point is not 0
             intAmount = Int(coreIn.editedAmount) //turn double into int
@@ -448,14 +445,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         else {
             let doubleAmount = Double(String(format: "%.3f", coreIn.editedAmount)) //3 numbers after decimal point
-        coreIn.modifiedIngredient = "\(doubleAmount!)" + " \(food!.unit)" //use original double
+            coreIn.modifiedIngredient = "\(doubleAmount!)" + " \(food!.unit)" //use original double
         }
         coreIn.editedServings = "\(food!.servings)"
         coreIn.unit = food!.unit
         coreIn.dish = dishes[dishes.count-1]
         
         if coreIn.name != nil {
-        DatabaseController.saveContext()//saving new CoreIngredient into Core Data
+            DatabaseController.saveContext()//saving new CoreIngredient into Core Data
         }
         
         return coreIn // returning a modified food details
@@ -472,8 +469,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
     }
     
-    func changeCoreIngredient(_ food: CoreIngredient, _ index: Int) {
-
+    func updateCoreIngredient(_ food: CoreIngredient, _ index: Int) {
+        
         ingredients[index] = food
         DatabaseController.saveContext()
     }
@@ -490,9 +487,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         quantLabel.text = String(number) //making stepper label a string version of int number
         for i in 0..<ingredients.count { //updating ingredients amounts to reflect step changes
             let converted = convertIngredient(food: ingredients[i])
-
+            
             ingredients[i] = modify(converted, true, i, nil)
-
+            
             if ingredients[i].name == nil {
                 return
             }
@@ -500,6 +497,19 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         dishes[dishes.count-1].editedServings = quantLabel.text //updating displayed dish servings label for core data save
         DatabaseController.saveContext()
         tableView.reloadData()
+    }
+    
+    func callAddIngredient(_ ingredient: CoreIngredient? = nil, _ index: Int? = nil) {
+        
+        let selectedVC = storyboard?.instantiateViewController(withIdentifier: "AddIngredientController") as! AddIngredientController
+        
+        selectedVC.updateIngredient = ingredient
+        selectedVC.chosenFood = self
+        selectedVC.passServings = stepper.value
+        selectedVC.passIndex = index
+        
+        present(selectedVC, animated: true, completion: nil) //transitioning to AddIngredientController
+        
     }
     
     //MARK: CAMERA
@@ -526,11 +536,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func basicAlert(selectedAlert: (String, String), returnAlert:(String,String,String)? = nil, passClosure: @escaping()  -> Void){
         let alert = UIAlertController(title: selectedAlert.0, message: selectedAlert.1, preferredStyle: .alert)
         let ok = UIAlertAction(title: "Back", style: .default, handler: {action in
-                        
+            
             if returnAlert != nil {
                 passClosure() //will rerun previous input text alert, result of invalid entry
             }})
-    
+        
         alert.addAction(ok)
         present(alert, animated: true)
     }
@@ -557,7 +567,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 if answer.text! == self.untitled {
                     existsMessage = "Please use a different name"
                 }
-
+                
                 self.basicAlert(selectedAlert: (self.tryAgain, existsMessage), returnAlert: selectedAlert, passClosure: first)
                 return
             }
@@ -618,7 +628,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let submitAction = UIAlertAction(title: submitTitle, style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
             let selectedDishTuple: (String, String, String) = (alertTitle, alertMessage, "")
-
+            
             let emptyStringCheck = self.handleEmpty(answer.text!, returnAlert: selectedDishTuple,methodClosure: methodClosure)
             guard emptyStringCheck == false else {
                 return
@@ -655,7 +665,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 self.navigationItem.title = createdDish.name
             }
             
-            self.updateCoreIngredients(createdDish) //changing the ingredients associated dish
+            self.matchCoreIngredients(createdDish) //changing the ingredients associated dish
             
             self.addCoreDish(createdDish) //sending that object to be saved
             
@@ -701,19 +711,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         callAddIngredient(nil,nil)
     }
     
-    func callAddIngredient(_ ingredient: CoreIngredient? = nil, _ index: Int? = nil) {
-        
-        let selectedVC = storyboard?.instantiateViewController(withIdentifier: "AddIngredientController") as! AddIngredientController
-        
-        selectedVC.updateIngredient = ingredient
-        selectedVC.chosenFood = self
-        selectedVC.passServings = stepper.value
-        selectedVC.passIndex = index
-        
-        present(selectedVC, animated: true, completion: nil) //transitioning to AddIngredientController
-        
-    }
-    
     @IBAction func saveButtonTapped(_ sender: Any) {
         
         if navigationItem.title == untitled {
@@ -757,7 +754,7 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
         guard ingredients.count != 0 else {
             return cell!
         }
-
+        
         cell?.textLabel!.text = ingredients[indexPath.row].name //cel text = ingredient name at indexPath
         cell?.detailTextLabel!.text = String(ingredients[indexPath.row].modifiedIngredient!) //detailText = ingredient amount and unit combined into modifiedIngredient
         
@@ -765,7 +762,6 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //*************
         callAddIngredient(ingredients[indexPath.row], indexPath.row)
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -788,25 +784,25 @@ extension DishController: AddIngredientDelegate {
         saveButton.isEnabled = true //hideview disappears and save button is enabled when getting new ingredient
         
         if dishes.last?.name == nil {
-            createTempDish(untitled)
+            createTempDish()
             DatabaseController.saveContext()
         }
         quantLabel.text = "\(food.servings)"
         stepper.value = Double(food.servings)
-    
+        
         let modifiedFood = modify(food, false, index, type)
         if type == "Add" {
-        addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
+            addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
         }
         else {
-  
-            changeCoreIngredient(modifiedFood, index!) //updating dish
+            
+            updateCoreIngredient(modifiedFood, index!) //updating dish
         }
         tabUpdate(1)
         resetServ()
         disableTrash()
         print(food.creationDate)
-
+        
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
 }
