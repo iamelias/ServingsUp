@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 protocol AddIngredientDelegate {
-    func getIngredient(food: Ingredient)
+    func getIngredient(food: Ingredient, type: String, index: Int?)
 }
 
 class AddIngredientController: UIViewController {
@@ -20,8 +20,13 @@ class AddIngredientController: UIViewController {
     @IBOutlet weak var amountTextField: UITextField!
     @IBOutlet weak var unitPicker: UIPickerView!
     @IBOutlet weak var emptyDishImage: UIImageView!
+    @IBOutlet weak var stepper: UIStepper!
+    @IBOutlet weak var addButton: UIButton!
     
     var chosenFood: AddIngredientDelegate!
+    var passServings: Double!
+    var updateIngredient: CoreIngredient!
+    var passIndex: Int!
     var massUnitArray: [String] = ["","oz","mg","g","kg","lb"] //tag 1
     var volumeUnitArray: [String] = ["","oz","tsp","tbsp","cup","pt","qt","mL","L","gal"] //tag 2
     var selectedUnitArray:[String] = [] //for picker display
@@ -36,6 +41,8 @@ class AddIngredientController: UIViewController {
         unitPicker.dataSource = self
         textField.delegate = self
         amountTextField.delegate = self
+        stepper.value = passServings
+        servingsNumLabel.text = "\(Int(stepper.value))"
         
         selectedUnitArray = massUnitArray
         
@@ -53,9 +60,57 @@ class AddIngredientController: UIViewController {
         if UIDevice.current.orientation.isLandscape {
             emptyDishImage.isHidden = true
         }
+        preSet(updateIngredient)
+        
+        createToolbar() //creating toolbar for the num pad's keyboard
+        
     }
     
     //MARK: ADDITIONAL METHODS
+    func createToolbar() {
+        let numPadToolbar: UIToolbar = UIToolbar()
+
+        numPadToolbar.barStyle = UIBarStyle.default
+        numPadToolbar.items=[
+            UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: self, action: nil),
+            UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(self.resignKeyboard))
+        ]
+
+        numPadToolbar.sizeToFit()
+        
+        amountTextField.inputAccessoryView = numPadToolbar
+    }
+    
+    @objc func resignKeyboard () {
+        amountTextField.resignFirstResponder()
+    }
+
+    func preSet(_ ingredient: CoreIngredient?) {
+        guard ingredient != nil else {
+            return
+        }
+        
+        textField.text = ingredient?.name ?? ""
+        amountTextField.text = "\(ingredient!.editedAmount)"
+        if ingredient!.unit! == "cups" {
+            ingredient!.unit! = "cup"
+        }
+        if volumeUnitArray.contains(ingredient!.unit!) {
+            selectedUnitArray = volumeUnitArray
+            unitPicker.reloadAllComponents()
+            let position = volumeUnitArray.firstIndex(of: ingredient!.unit!)
+            unitPicker.selectRow(position ?? 0, inComponent: 0, animated: true) // default picker selection
+            selectedUnit = ingredient!.unit!
+        }
+        else if massUnitArray.contains(ingredient!.unit!) {
+            let position = massUnitArray.firstIndex(of: ingredient!.unit!)
+            unitPicker.selectRow(position ?? 0, inComponent: 0, animated: true) // default picker selection
+            selectedUnit = ingredient!.unit!
+        }
+        
+        addButton.setTitle("Update", for: .normal)
+    }
+    
     func hapticError() {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.error)
@@ -74,7 +129,7 @@ class AddIngredientController: UIViewController {
         ingredient.amount = Double(testAmountDouble ?? 0.0) //storing initial amount of unit as double
         ingredient.unit = selectedUnit
         
-        chosenFood.getIngredient(food: ingredient)
+        chosenFood.getIngredient(food: ingredient, type: addButton.currentTitle!, index: passIndex)
     }
     
     func stringCountCheck(_ value: String?) -> Bool {
@@ -88,7 +143,7 @@ class AddIngredientController: UIViewController {
         }
         return true
     }
-    
+
     func decimalCheck(_ value: String) -> Bool { //making sure input is a double number
         
         let filteredValue = value.trimmingCharacters(in: .whitespaces) //removing empty spaces from decimal amount
@@ -118,7 +173,6 @@ class AddIngredientController: UIViewController {
             emptyDishImage.isHidden = false
         }
     }
-    
     
     //MARK: ALERT METHODS
     func showAlert(selectedAlert: (String, String))  {

@@ -167,10 +167,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             print("unable to fetch")
             return
         }
+
         checkNilIngredient() // checking/removing any nil ingredients
         
         DatabaseController.saveContext()
-        
+  
         tableView.reloadData() //reload table to show ingredients
     }
     
@@ -407,35 +408,39 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         ingredient.editedAmount = food.editedAmount
         ingredient.unit = food.unit!
         ingredient.amount = food.singleAmount // 1 serving of amount
+        ingredient.creationDate = Date()
         
         return ingredient
     }
     
-    func modify(_ food: Ingredient? = nil, _ selfStepper: Bool, _ i: Int?) -> CoreIngredient{
+    func modify(_ food: Ingredient? = nil, _ selfStepper: Bool, _ i: Int?, _ type: String?) -> CoreIngredient{ //updating core data saves (coreIn)
         var coreIn: CoreIngredient!
         if selfStepper == true { // if using stepper
           coreIn = ingredients[i!]
         }
          else if selfStepper == false {// if not using stepper but(adding ingredient)
+            if type == "Update" {
+                coreIn = ingredients[i!]
+            }
+            else {
             coreIn = CoreIngredient(context: context)
+            }
         }
         if i != nil {
             coreIn = ingredients[i!]
         }
-        coreIn.creationDate = food!.creationDate
+        //coreIn.creationDate = food!.creationDate
+        
+        if type == "Add" {
+        coreIn.creationDate = Date()
+        }
         coreIn.name = food!.name
         coreIn.singleAmount = food!.amount/Double(food!.servings) //amount per 1 serving
         let changedQuantLabel = Double(quantLabel!.text ?? "1") //converting self stepper to Double for calc
         coreIn.editedAmount = coreIn.singleAmount * Double(changedQuantLabel ?? 1.0) //amount dependant on stepper
+  
+        checkPlural(food, coreIn)
 
-        if food!.unit == "cup" && coreIn.editedAmount != 1.0 {
-            food!.unit = "cups"
-        }
-        
-        if food!.unit == "cups" && coreIn.editedAmount == 1.0 {
-            food!.unit = "cup"
-        }
-        
         var intAmount: Int = 1
         if coreIn.editedAmount.remainder(dividingBy: 1) == 0 { //if number after dec point is not 0
             intAmount = Int(coreIn.editedAmount) //turn double into int
@@ -454,6 +459,47 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         
         return coreIn // returning a modified food details
+    }
+    
+    func checkPlural(_ food: Ingredient?, _ coreIn: CoreIngredient) { //used with modify function to determine if using cup/cups
+        if food!.unit == "cup" && coreIn.editedAmount != 1.0 {
+            food!.unit = "cups"
+        }
+        
+        if food!.unit == "cups" && coreIn.editedAmount == 1.0 {
+            food!.unit = "cup"
+        }
+        
+    }
+    
+    func changeCoreIngredient(_ food: CoreIngredient, _ index: Int) {
+
+        ingredients[index] = food
+        DatabaseController.saveContext()
+    }
+    
+    func steppingUpdate(_ num: Double) {
+        var senderValue = num
+        
+        guard dishes.count != 0 && ingredients.count != 0 else {
+            senderValue = 1.0 //making sure stepper default is 1
+            return
+        }
+        
+        let number = Int(senderValue) //stepper increments by int won't assign nil
+        quantLabel.text = String(number) //making stepper label a string version of int number
+        for i in 0..<ingredients.count { //updating ingredients amounts to reflect step changes
+            let converted = convertIngredient(food: ingredients[i])
+
+            ingredients[i] = modify(converted, true, i, nil)
+
+            if ingredients[i].name == nil {
+                return
+            }
+        }
+        dishes[dishes.count-1].editedServings = quantLabel.text //updating displayed dish servings label for core data save
+        DatabaseController.saveContext()
+        tableView.reloadData()
     }
     
     //MARK: CAMERA
@@ -523,9 +569,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         alert.addAction(rename)
         
-        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
-            alert.view.superview?.isUserInteractionEnabled = true
-            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+        presentAlert(alert)
     }
     
     func defaultAlert(first: @escaping() -> Void, second: @escaping() -> Void, selectedAlert:(String,String,String,String)) { //Default style alert
@@ -543,9 +587,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         alert.addAction(first)
         alert.addAction(second)
         
-        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
-            alert.view.superview?.isUserInteractionEnabled = true
-            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+        presentAlert(alert)
     }
     
     func cancelAlert(first: @escaping() -> Void, selectedAlert:(String, String, String)) { //cancel alert style
@@ -559,9 +601,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         alert.addAction(cancel)
         alert.addAction(delete)
         
-        present(alert, animated: true, completion:{ //setting up tap gesture recognizer
-            alert.view.superview?.isUserInteractionEnabled = true
-            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
+        presentAlert(alert)
     }
     
     func createAlert(alertTitle: String, alertMessage: String) {
@@ -627,6 +667,12 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         
         alert.addAction(submitAction)
+        
+        presentAlert(alert)
+    }
+    
+    func presentAlert(_ alert: UIAlertController) {
+        
         present(alert, animated: true, completion:{ //setting up tap gesture recognizer
             alert.view.superview?.isUserInteractionEnabled = true
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertBackgroundTapped)))} )
@@ -634,28 +680,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     //MARK: IBACTIONS METHODS
     @IBAction func stepperTapped(_ sender: UIStepper) { //Stepper changing quantLabel/number of servings
-        guard dishes.count != 0 && ingredients.count != 0 else {
-            sender.value = 1.0 //making sure stepper default is 1
+        
+        guard ingredients.count != 0 else {
+            steppingUpdate(1.0)
             return
         }
         
-        let number = Int(sender.value) //stepper increments by int won't assign nil
-        quantLabel.text = String(number) //making stepper label a string version of int number
-        
-        for i in 0..<ingredients.count { //updating ingredients amounts to reflect step changes
-            let converted = convertIngredient(food: ingredients[i])
-
-            ingredients[i] = modify(converted, true, i)
-
-            if ingredients[i].name == nil {
-                return
-            }
-        }
-        
-        dishes[dishes.count-1].editedServings = quantLabel.text //updating displayed dish servings label for core data save
-        DatabaseController.saveContext()
-        tableView.reloadData()
+        steppingUpdate(sender.value)
     }
+    
     @IBAction func cameraButtonTapped(_ sender: Any) {
         DispatchQueue.main.async {
             self.activityIndicator.isHidden = false
@@ -665,12 +698,20 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     @IBAction func addButtonTapped(_ sender: Any) {
+        callAddIngredient(nil,nil)
+    }
+    
+    func callAddIngredient(_ ingredient: CoreIngredient? = nil, _ index: Int? = nil) {
         
         let selectedVC = storyboard?.instantiateViewController(withIdentifier: "AddIngredientController") as! AddIngredientController
         
+        selectedVC.updateIngredient = ingredient
         selectedVC.chosenFood = self
+        selectedVC.passServings = stepper.value
+        selectedVC.passIndex = index
         
         present(selectedVC, animated: true, completion: nil) //transitioning to AddIngredientController
+        
     }
     
     @IBAction func saveButtonTapped(_ sender: Any) {
@@ -724,6 +765,8 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //*************
+        callAddIngredient(ingredients[indexPath.row], indexPath.row)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -740,20 +783,32 @@ extension DishController: UITableViewDelegate, UITableViewDataSource {
 //MARK: ADD INGREDIENT DELEGATE
 extension DishController: AddIngredientDelegate {
     
-    func getIngredient(food: Ingredient) { //Getting new ingredient to add to dish
+    func getIngredient(food: Ingredient, type: String, index: Int?) { //Getting new ingredient to add to dish
+        steppingUpdate(Double(food.servings))
         saveButton.isEnabled = true //hideview disappears and save button is enabled when getting new ingredient
         
         if dishes.last?.name == nil {
             createTempDish(untitled)
             DatabaseController.saveContext()
         }
-        
-        let modifiedFood = modify(food, false, nil)
+        quantLabel.text = "\(food.servings)"
+        stepper.value = Double(food.servings)
+    
+        let modifiedFood = modify(food, false, index, type)
+        if type == "Add" {
         addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
+        }
+        else {
+  
+            changeCoreIngredient(modifiedFood, index!) //updating dish
+        }
         tabUpdate(1)
         resetServ()
         disableTrash()
+        print(food.creationDate)
+
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
 }
+
 

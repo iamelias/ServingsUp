@@ -104,8 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				6433A13B23DE7989002A14BF /* DishController.swift */,
-				6433A14E23DE7A58002A14BF /* BookController.swift */,
 				6433A15223DE7ABA002A14BF /* AddIngredientController.swift */,
+				6433A14E23DE7A58002A14BF /* BookController.swift */,
 				6433A15023DE7A9E002A14BF /* TabShareController.swift */,
 				6433A15D23DE7B22002A14BF /* DatabaseController.swift */,
 			);
