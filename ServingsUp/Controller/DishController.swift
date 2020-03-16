@@ -261,7 +261,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         for i in 0..<ingredients.count {
             if ingredients[i].name == nil && dishes[i].name == untitled{
                 ingredients.remove(at: i)
-                print("removing \(i)")
             }
         }
     }
@@ -800,9 +799,7 @@ extension DishController: AddIngredientDelegate {
         }
         tabUpdate(1)
         resetServ()
-        disableTrash()
-        print(food.creationDate)
-        
+        disableTrash()        
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
 }

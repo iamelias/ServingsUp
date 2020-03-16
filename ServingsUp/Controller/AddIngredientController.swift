@@ -91,7 +91,12 @@ class AddIngredientController: UIViewController {
         }
         
         textField.text = ingredient?.name ?? ""
-        amountTextField.text = "\(ingredient!.editedAmount)"
+        var reformattedAmount = String(format: "%.3f", ingredient!.editedAmount) //with trailing zeros
+        
+        reformattedAmount = removeTrailingZeros(reformattedAmount) //removes trailing zeros
+
+        amountTextField.text = reformattedAmount //without trailing zeros
+        
         if ingredient!.unit! == "cups" {
             ingredient!.unit! = "cup"
         }
@@ -130,6 +135,19 @@ class AddIngredientController: UIViewController {
         ingredient.unit = selectedUnit
         
         chosenFood.getIngredient(food: ingredient, type: addButton.currentTitle!, index: passIndex)
+    }
+    
+    func removeTrailingZeros(_ passText: String) -> String {
+        
+        var text = passText
+        while text.last == "0" { //if last letter is 0
+            text.removeLast() //remove it
+            if text.last == "." { //check if last element is "."
+                text.removeLast() //also remove it
+                break //will not remove before whole number
+            }
+        }
+        return text
     }
     
     func stringCountCheck(_ value: String?) -> Bool {
