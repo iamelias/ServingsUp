@@ -279,7 +279,7 @@ extension AddIngredientController: UIPickerViewDelegate, UIPickerViewDataSource 
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedUnit = selectedUnitArray[row]
-        view.endEditing(true)
+        //view.endEditing(true)
     }
 }
 

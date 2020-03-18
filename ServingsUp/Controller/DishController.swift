@@ -28,8 +28,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     var savedDishName: String = "" //dish name
     let untitled = "Untitled"
     let tryAgain = "Try Again"
-    let blankError = "Please enter a name"
-    let existsError = "This dish already exists"
+    let blankError = "Please enter a name."
+    let existsError = "This dish already exists."
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
@@ -101,6 +101,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         disableTrash()
         
         colorCameraControl()
+        
+        guard navigationItem.title != "Untitled" else {
+            enableCamera(false)
+            return
+        }
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
     }
     
@@ -490,10 +495,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     func steppingUpdate(_ num: Double) {
-        var senderValue = num
+        let senderValue = num
         
-        guard dishes.count != 0 && ingredients.count != 0 else {
-            senderValue = 1.0 //making sure stepper default is 1
+        guard dishes.count != 0 && ingredients.count != 0 else { //if dishes is > 0 and ingredients is > 0
+            stepper.value = 1.0 //making sure stepper default is 1
             return
         }
         
@@ -579,7 +584,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 var existsMessage = self.existsError
                 
                 if answer.text! == self.untitled {
-                    existsMessage = "Please use a different name"
+                    existsMessage = "Please use a different name."
                 }
                 
                 self.basicAlert(selectedAlert: (self.tryAgain, existsMessage), returnAlert: selectedAlert, passClosure: first)
@@ -651,9 +656,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             nameExists = self.checkNameExists(answer.text ?? "nil")
             guard nameExists == false && (answer.text != "nil" && answer.text != self.untitled) else {
                 self.hapticError()
-                var existsMessage = "There is already a dish named \(answer.text!). Please enter a new name"
+                var existsMessage = "There is already a dish named \(answer.text!). Please enter a new name."
                 if answer.text! == self.untitled {
-                    existsMessage = "Please use a different name"
+                    existsMessage = "Please use a different name."
                 }
                 self.basicAlert(selectedAlert: (self.tryAgain, existsMessage),returnAlert: selectedDishTuple,passClosure:methodClosure) //passing in first closure
                 return
@@ -665,7 +670,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
             self.savedDishName = answer.text ?? "Dish"
             guard self.savedDishName != "Dish" else {//Dish name is not allowed
-                let passMessage = "Choose a different name"
+                let passMessage = "Choose a different name."
                 self.navigationItem.title = self.savedDishName
                 self.createAlert(alertTitle: self.tryAgain, alertMessage: passMessage) //alert to rechoose name
                 return
@@ -728,7 +733,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBAction func saveButtonTapped(_ sender: Any) {
         
         if navigationItem.title == untitled {
-            createAlert(alertTitle: "Save Dish", alertMessage: "Enter the name of your dish")
+            createAlert(alertTitle: "Save Dish", alertMessage: "Enter the name of your dish.")
         }
             
         else {
