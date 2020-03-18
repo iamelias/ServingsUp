@@ -19,9 +19,9 @@ class AddIngredientController: UIViewController {
     @IBOutlet weak var servingsNumLabel: UILabel!
     @IBOutlet weak var amountTextField: UITextField!
     @IBOutlet weak var unitPicker: UIPickerView!
-    @IBOutlet weak var emptyDishImage: UIImageView!
     @IBOutlet weak var stepper: UIStepper!
     @IBOutlet weak var addButton: UIButton!
+    @IBOutlet weak var emptyDishIcon: UIImageView!
     
     var chosenFood: AddIngredientDelegate!
     var passServings: Double!
@@ -57,9 +57,8 @@ class AddIngredientController: UIViewController {
         if unitPicker.isUserInteractionEnabled { // if picker is being moved
             view.endEditing(true) //dismiss keyboard
         }
-        if UIDevice.current.orientation.isLandscape {
-            emptyDishImage.isHidden = true
-        }
+    
+        amountTextField.keyboardType = .decimalPad
         preSet(updateIngredient) //if updating instead of adding new, will fill in view with already existing values
         
         createToolbar() //creating toolbar for the num pad's keyboard
@@ -181,15 +180,6 @@ class AddIngredientController: UIViewController {
     
     @objc func action() { // if tap or swipe dismiss keyboard
         view.endEditing(true)
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        if UIDevice.current.orientation.isLandscape {
-            emptyDishImage.isHidden = true //Hide empty dish image if changing orientation to landscape
-        }
-        else {
-            emptyDishImage.isHidden = false
-        }
     }
     
     //MARK: ALERT METHODS

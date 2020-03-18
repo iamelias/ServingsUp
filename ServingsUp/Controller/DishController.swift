@@ -39,7 +39,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     var resetServingsCheck: Bool { //checks if ingredients count is 0
         return ingredients.count == 0
     }
-    var originalPhoto: UIImage! //storing original non-meme image
+    var originalPhoto: UIImage! //storing original image
     
     enum SaveButton: String {
         case New = "New"
@@ -51,7 +51,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         enableCamera(false)
         activityIndicator.isHidden = true
         defaultView()
@@ -69,6 +68,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         dishes = dishes.filter{$0.name != nil}
         DatabaseController.saveContext()
         tableView.reloadData()
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -99,6 +99,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         resetServ()
         disableTrash()
+        
+        colorCameraControl()
+        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -181,7 +184,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         if dishes[0].name == untitled { //if first dish is untitled remove it
             dishes.remove(at: 0)
         }
-        enableCamera(true)
+        //enableCamera(true)
+        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+
+        colorCameraControl()
         DatabaseController.saveContext() //saving to core data
     }
     
@@ -191,6 +197,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         tab.allDishes.removeLast()
         context.delete(selectDish)
         DatabaseController.saveContext()
+        colorCameraControl()
     }
     
     //MARK: UPDATE CORE INGREDIENTS METHODS
@@ -472,6 +479,14 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         ingredients[index] = food
         DatabaseController.saveContext()
+    }
+    
+    func colorCameraControl() {
+        
+        switch dishes.last?.image != nil {
+        case true: cameraButton.tintColor = .systemGreen
+        case false: cameraButton.tintColor = .none
+        }
     }
     
     func steppingUpdate(_ num: Double) {
@@ -799,7 +814,7 @@ extension DishController: AddIngredientDelegate {
         }
         tabUpdate(1)
         resetServ()
-        disableTrash()        
+        disableTrash()
         tableView.reloadData() //reloading table to show new CoreIngredient
     }
 }
