@@ -185,6 +185,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     //MARK: UPDATE CORE DISH METHODS
     func addCoreDish(_ dish: CoreDish) { //saving added dish to core data
+        if saveButton.title == SaveButton.New.rawValue {
+        stepper.value = 1.0
+        quantLabel.text = "1"
+        }
         dishes.append(dish)
         if dishes[0].name == untitled { //if first dish is untitled remove it
             dishes.remove(at: 0)
@@ -677,10 +681,15 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 self.createAlert(alertTitle: self.tryAgain, alertMessage: passMessage) //alert to rechoose name
                 return
             }
+            
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             
             let createdDish = self.createDish(answer.text!)
-            self.steppingUpdate(1.0)
+            
+//            if self.ingredients.count != 0 && self.navigationItem.title != "Untitled" {
+//            self.steppingUpdate(1.0)
+//            }
+
             self.disableTrash()
             if self.saveButton.title == SaveButton.New.rawValue {
                 self.ingredients = []
