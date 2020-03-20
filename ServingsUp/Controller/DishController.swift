@@ -504,6 +504,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         
         let number = Int(senderValue) //stepper increments by int won't assign nil
+        stepper.value = senderValue
         quantLabel.text = String(number) //making stepper label a string version of int number
         for i in 0..<ingredients.count { //updating ingredients amounts to reflect step changes
             let converted = convertIngredient(food: ingredients[i])
