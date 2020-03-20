@@ -499,6 +499,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         guard dishes.count != 0 && ingredients.count != 0 else { //if dishes is > 0 and ingredients is > 0
             stepper.value = 1.0 //making sure stepper default is 1
+            quantLabel.text = "1"
             return
         }
         
@@ -678,6 +679,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             
             let createdDish = self.createDish(answer.text!)
+            self.steppingUpdate(1.0)
             self.disableTrash()
             if self.saveButton.title == SaveButton.New.rawValue {
                 self.ingredients = []
