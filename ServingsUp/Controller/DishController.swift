@@ -185,10 +185,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     //MARK: UPDATE CORE DISH METHODS
     func addCoreDish(_ dish: CoreDish) { //saving added dish to core data
-        if saveButton.title == SaveButton.New.rawValue {
-        stepper.value = 1.0
-        quantLabel.text = "1"
-        }
+
         dishes.append(dish)
         if dishes[0].name == untitled { //if first dish is untitled remove it
             dishes.remove(at: 0)
@@ -500,12 +497,8 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     func steppingUpdate(_ num: Double) {
         let senderValue = num
-        
-        guard dishes.count != 0 && ingredients.count != 0 else { //if dishes is > 0 and ingredients is > 0
-            stepper.value = 1.0 //making sure stepper default is 1
-            quantLabel.text = "1"
-            return
-        }
+
+        guard dishes.count != 0 else {return}
         
         let number = Int(senderValue) //stepper increments by int won't assign nil
         stepper.value = senderValue
@@ -682,6 +675,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 return
             }
             
+            if self.saveButton.title == SaveButton.New.rawValue {
+                self.stepper.value = 1.0
+                self.quantLabel.text = "1"
+            }
+            
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             
             let createdDish = self.createDish(answer.text!)
@@ -820,7 +818,7 @@ extension DishController: AddIngredientDelegate {
         }
         quantLabel.text = "\(food.servings)"
         stepper.value = Double(food.servings)
-        
+        steppingUpdate(stepper.value)
         let modifiedFood = modify(food, false, index, type)
         if type == "Add" {
             addCoreIngredient(modifiedFood) //appending a core Ingredient to "ingredients"
