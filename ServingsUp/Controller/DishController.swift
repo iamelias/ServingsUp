@@ -6,7 +6,6 @@
 //  Copyright © 2020 Elias Hall. All rights reserved.
 //
 
-
 import UIKit
 import Foundation
 import CoreData
@@ -679,10 +678,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
             
             let createdDish = self.createDish(answer.text!)
-            
-//            if self.ingredients.count != 0 && self.navigationItem.title != "Untitled" {
-//            self.steppingUpdate(1.0)
-//            }
 
             self.disableTrash()
             if self.saveButton.title == SaveButton.New.rawValue {
