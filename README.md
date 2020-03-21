@@ -12,11 +12,11 @@
 **Select below for larger clearer image**
 <p float="left">
 <img src = "Images/ScreenShot1.png" width="100" height="200">
-<img src = "Images/ScreenShot2.png" width="100" height="200">
-<img src = "Images/ScreenShot3.png" width="100" height="200">
-<img src = "Images/ScreenShot4.png" width="100" height="200">
-<img src = "Images/ScreenShot5.png" width="100" height="200">
-<img src = "Images/ScreenShot6.png" width="100" height="200">
-<img src = "Images/ScreenShot7.png" width="100" height="200">
- <img src = "Images/ScreenShot8.png" width="100" height="200">
+<img src = "Images/ScreenShot2.PNG" width="100" height="200">
+<img src = "Images/ScreenShot3.PNG" width="100" height="200">
+<img src = "Images/ScreenShot4.PNG" width="100" height="200">
+<img src = "Images/ScreenShot5.PNG" width="100" height="200">
+<img src = "Images/ScreenShot6.PNG" width="100" height="200">
+<img src = "Images/ScreenShot7.PNG" width="100" height="200">
+ <img src = "Images/ScreenShot8.PNG" width="100" height="200">
 </p>
