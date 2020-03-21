@@ -244,8 +244,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     func defaultView() { //default view setting. If no dish is in dishes array
         navigationItem.title = untitled
         saveButton.title = SaveButton.Save.rawValue
-        quantLabel.text = "1"
-        stepper.value = 1.0
+        resetServ()
         
         if ingredients.count == 0 {
             disableTrash()
@@ -438,7 +437,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         if i != nil {
             coreIn = ingredients[i!]
         }
-        //coreIn.creationDate = food!.creationDate
         
         if type == "Add" {
             coreIn.creationDate = Date()
@@ -651,7 +649,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             guard emptyStringCheck == false else {
                 return
             }
-            
             nameExists = self.checkNameExists(answer.text ?? "nil")
             guard nameExists == false && (answer.text != "nil" && answer.text != self.untitled) else {
                 self.hapticError()
@@ -676,8 +673,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
             
             if self.saveButton.title == SaveButton.New.rawValue {
-                self.stepper.value = 1.0
-                self.quantLabel.text = "1"
+                self.resetServ()
             }
             
             self.navigationItem.title = self.savedDishName // nav title updates to saved name
@@ -697,7 +693,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.matchCoreIngredients(createdDish) //changing the ingredients associated dish
             
             self.addCoreDish(createdDish) //sending that object to be saved
-            
+            self.resetServ()
             self.tab.allDishes = self.dishes
             self.tableView.reloadData()
             if self.navigationItem.title != self.untitled {
@@ -721,7 +717,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBAction func stepperTapped(_ sender: UIStepper) { //Stepper changing quantLabel/number of servings
         
         guard ingredients.count != 0 else {
-            steppingUpdate(1.0)
+            resetServ()
             return
         }
         
