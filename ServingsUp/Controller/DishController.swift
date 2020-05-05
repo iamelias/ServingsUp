@@ -27,8 +27,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     var savedDishName: String = "" //dish name
     let untitled = "Untitled"
     let tryAgain = "Try Again"
-    let blankError = "Please enter a name."
-    let existsError = "This dish already exists."
+    
     var tab: TabShareController {
         return tabBarController as! TabShareController
     }
@@ -39,11 +38,6 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         return ingredients.count == 0
     }
     var originalPhoto: UIImage! //storing original image
-    
-    enum SaveButton: String {
-        case New = "New"
-        case Save = "Save"
-    }
     
     //MARK: VIEW LIFECYCLE METHODS
     override func viewDidLoad() {
@@ -56,16 +50,16 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         fetchDishes() // getting all dishes in core data
         fetchIngredients() // getting all ingredients of last created entity
         
-        guard dishes.count>=1 else{return}
+        guard dishes.count>=1 else{return} //check if any dishes where fetched
         for i in 0..<dishes.count-1 {
             if dishes[i].name == untitled {
-                context.delete(dishes[i])
+                context.delete(dishes[i]) //delete all untitled dishes
             }
         }
         
-        dishes = dishes.filter{$0.name != untitled}
-        dishes = dishes.filter{$0.name != nil}
-        DatabaseController.saveContext()
+        dishes = dishes.filter{$0.name != untitled} //make sure there are no "Untitled" dishes
+        dishes = dishes.filter{$0.name != nil} //ensure there are no nil dishes
+        DatabaseController.saveContext() //update data model
         tableView.reloadData()
 
     }
@@ -91,17 +85,17 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         
         if navigationItem.title != untitled { //if nav title is string other than "Untitled"
-            viewSettings(true,true,SaveButton: SaveButton.New)
+            viewSettings(true,true,SaveButton: NewSave.New)
         }
         else { //If nav title is "Untitled"
-            viewSettings(false,true,SaveButton: SaveButton.Save)
+            viewSettings(false,true,SaveButton: NewSave.Save)
         }
         resetServ()
         disableTrash()
         
         colorCameraControl()
         
-        guard navigationItem.title != "Untitled" else {
+        guard navigationItem.title != untitled else {
             enableCamera(false)
             return
         }
@@ -140,7 +134,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
             
         catch{
-            print("unable to fetch")
+            print(Messages.unableToFetch.rawValue)
             return
         }
         
@@ -171,7 +165,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
             
         catch{
-            print("unable to fetch")
+            print(Messages.unableToFetch.rawValue)
             return
         }
         
@@ -234,7 +228,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     //MARK: ADDITIONAL METHODS
     
-    func viewSettings(_ cameraSetting: Bool,_ SaveSetting: Bool, SaveButton: SaveButton) { //Nav Setup depending on title
+    func viewSettings(_ cameraSetting: Bool,_ SaveSetting: Bool, SaveButton: NewSave) { //Nav Setup depending on title
         enableCamera(cameraSetting)
         saveButton.isEnabled = SaveSetting
         saveButton.title = SaveButton.rawValue
@@ -242,7 +236,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     func defaultView() { //default view setting. If no dish is in dishes array
         navigationItem.title = untitled
-        saveButton.title = SaveButton.Save.rawValue
+        saveButton.title = NewSave.Save.rawValue
         resetServ()
         
         if ingredients.count == 0 {
@@ -307,7 +301,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     }
     
     func deleting() {
-        saveButton.title = SaveButton.Save.rawValue
+        saveButton.title = NewSave.Save.rawValue
         guard dishes.count != 0 else {
             return
         }
@@ -351,11 +345,11 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let first = {}
         
         if value!.count == 0 {
-            basicAlert(selectedAlert: (tryAgain,blankError), passClosure: first)
+            basicAlert(selectedAlert: (tryAgain,Messages.enterName.rawValue), passClosure: first)
             return false
         }
         else if value!.count>25 {
-            basicAlert(selectedAlert:(tryAgain,"Please enter a shorter name"),returnAlert: nil,passClosure: first)
+            basicAlert(selectedAlert:(tryAgain,Messages.shorterName.rawValue),returnAlert: nil,passClosure: first)
             return false
         }
         else {
@@ -373,7 +367,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         if edited.count == 0 { //if string count is 0 string was either empty or made up of only spaces
             hapticError()
-            basicAlert(selectedAlert: (tryAgain, blankError), returnAlert: returnAlert, passClosure: methodClosure)
+            basicAlert(selectedAlert: (tryAgain, Messages.enterName.rawValue), returnAlert: returnAlert, passClosure: methodClosure)
             return true
         }
         else {return false}
@@ -577,10 +571,10 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             nameExists = self.checkNameExists(answer.text ?? "nil")
             guard nameExists == false && (answer.text != "nil" && answer.text != self.untitled) else {
                 self.hapticError()
-                var existsMessage = self.existsError
+                var existsMessage = Messages.existsError.rawValue
                 
                 if answer.text! == self.untitled {
-                    existsMessage = "Please use a different name."
+                    existsMessage = Messages.differentName.rawValue
                 }
                 
                 self.basicAlert(selectedAlert: (self.tryAgain, existsMessage), returnAlert: selectedAlert, passClosure: first)
@@ -636,9 +630,9 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         var nameExists = false
         let alert = UIAlertController(title: alertTitle , message: alertMessage, preferredStyle: .alert)
         alert.addTextField()
-        var submitTitle = "Save"
-        if saveButton.title == SaveButton.New.rawValue {
-            submitTitle = "Create"
+        var submitTitle = NewSave.Save.rawValue
+        if saveButton.title == NewSave.New.rawValue {
+            submitTitle = NewSave.Create.rawValue
         }
         let submitAction = UIAlertAction(title: submitTitle, style: .default) { [unowned alert] _ in
             let answer = alert.textFields![0]
@@ -653,7 +647,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
                 self.hapticError()
                 var existsMessage = "There is already a dish named \(answer.text!). Please enter a new name."
                 if answer.text! == self.untitled {
-                    existsMessage = "Please use a different name."
+                    existsMessage = Messages.differentName.rawValue
                 }
                 self.basicAlert(selectedAlert: (self.tryAgain, existsMessage),returnAlert: selectedDishTuple,passClosure:methodClosure) //passing in first closure
                 return
@@ -665,13 +659,13 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             }
             self.savedDishName = answer.text ?? "Dish"
             guard self.savedDishName != "Dish" else {//Dish name is not allowed
-                let passMessage = "Choose a different name."
+                let passMessage = Messages.differentName.rawValue
                 self.navigationItem.title = self.savedDishName
                 self.createAlert(alertTitle: self.tryAgain, alertMessage: passMessage) //alert to rechoose name
                 return
             }
             
-            if self.saveButton.title == SaveButton.New.rawValue {
+            if self.saveButton.title == NewSave.New.rawValue {
                 self.resetServ()
             }
             
@@ -680,7 +674,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             let createdDish = self.createDish(answer.text!)
 
             self.disableTrash()
-            if self.saveButton.title == SaveButton.New.rawValue {
+            if self.saveButton.title == NewSave.New.rawValue {
                 self.ingredients = []
                 self.navigationItem.title = createdDish.name
             }
@@ -692,7 +686,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
             self.tab.allDishes = self.dishes
             self.tableView.reloadData()
             if self.navigationItem.title != self.untitled {
-                self.saveButton.title = SaveButton.New.rawValue
+                self.saveButton.title = NewSave.New.rawValue
             }
         }
         
@@ -734,18 +728,18 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBAction func saveButtonTapped(_ sender: Any) {
         
         if navigationItem.title == untitled {
-            createAlert(alertTitle: "Save Dish", alertMessage: "Enter the name of your dish.")
+            createAlert(alertTitle: "Save Dish", alertMessage: Messages.enterName.rawValue)
         }
             
         else {
             let first = {
-                self.renameAlert(selectedAlert: ("Rename Dish", "Enter a new name for this dish", "Rename"))
+                self.renameAlert(selectedAlert: ("Rename Dish", Messages.newDishName.rawValue, "Rename"))
             }
             
             let second = {
-                self.createAlert(alertTitle: "Create Dish", alertMessage: "What will your new dish be called?")
+                self.createAlert(alertTitle: "Create Dish", alertMessage: Messages.dishNameQuestion.rawValue)
             }
-            defaultAlert(first: first, second: second, selectedAlert: ("Create Dish", "Rename or Create New", "Rename",SaveButton.New.rawValue))
+            defaultAlert(first: first, second: second, selectedAlert: ("Create Dish", "Rename or Create New", "Rename",NewSave.New.rawValue))
         }
     }
     
@@ -755,7 +749,7 @@ class DishController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         let first = { self.deleting()
             self.disableTrash()
         }
-        cancelAlert(first: first, selectedAlert: ("Delete Dish", "Are you sure you want to permanently delete this dish?", "Delete"))
+        cancelAlert(first: first, selectedAlert: ("Delete Dish", Messages.permDeleteDish.rawValue, "Delete"))
     }
 }
 

@@ -32,7 +32,6 @@ class AddIngredientController: UIViewController {
     var selectedUnitArray:[String] = [] //for picker display
     var selectedUnit: String = "" //default mass unit selected with pickerview
     let tryAgain = "Try Again"
-    let blankError = "Please enter a name"
     
     //MARK: VIEW LIFE CYCLE METHODS
     override func viewDidLoad() {
@@ -151,11 +150,11 @@ class AddIngredientController: UIViewController {
     
     func stringCountCheck(_ value: String?) -> Bool {
         if value!.count == 0 { //if input string count is 0
-            showAlert(selectedAlert: (tryAgain,"Neither name nor amount can be empty"))
+            showAlert(selectedAlert: (tryAgain,Messages.neitherEmpty.rawValue))
             return false
         }
         else if value!.count >= 20 { // if input string count is greater than 20
-            showAlert(selectedAlert:(tryAgain,"Please enter a shorter name for the Ingredient"))
+            showAlert(selectedAlert:(tryAgain,Messages.shorterName.rawValue))
             return false
         }
         return true
@@ -167,12 +166,12 @@ class AddIngredientController: UIViewController {
         let checkNum = Double(filteredValue)
         if checkNum == nil {
             amountTextField.shake()
-            showAlert(selectedAlert: (tryAgain,"Please enter Initial Amount in decimal format"))
+            showAlert(selectedAlert: (tryAgain,Messages.decimalFormat.rawValue))
             return false
         }
         if checkNum! >= 10000 {
             amountTextField.shake()
-            showAlert(selectedAlert: (tryAgain,"Please enter smaller number for Initial Amount"))
+            showAlert(selectedAlert: (tryAgain,Messages.smallerNumber.rawValue))
             return false
         }
         return true
